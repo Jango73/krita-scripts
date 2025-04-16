@@ -3,9 +3,13 @@ from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QByteArray
 import os
 import re
+import json
 
-# 🔧 Dossier de sortie de Comfy (contenant les images modifiées et tile_order.txt)
-comfy_output_folder = r"C:\output"
+# 🔧 Charger les chemins depuis le fichier config
+with open("c:/krita-scripts/comfy/comfy_config.json", "r") as f:
+    config = json.load(f)
+
+comfy_output_folder = config["comfy_output_folder"]
 
 def reassemble_from_tile_order():
     app = Krita.instance()

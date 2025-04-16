@@ -1,12 +1,16 @@
 from krita import Krita, InfoObject
 import os
 import tempfile
+import json
 
 tile_size = 1536
 
-# 🔧 Dossiers à configurer
-comfy_input_folder = r"C:\input"
-comfy_output_folder = r"C:\output"
+# 🔧 Charger les chemins depuis le fichier config
+with open("c:/krita-scripts/comfy/comfy_config.json", "r") as f:
+    config = json.load(f)
+
+comfy_input_folder = config["comfy_input_folder"]
+comfy_output_folder = config["comfy_output_folder"]
 
 def export_tiles():
     app = Krita.instance()
