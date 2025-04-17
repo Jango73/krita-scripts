@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=select_face
+X-Python-2-Compatible=false
+X-Krita-Manual=Manual.html
+Name=select_face
+Comment=Selects the face if detected
