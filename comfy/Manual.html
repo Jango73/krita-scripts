@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ComfyUI Image Enhance - Manual</title>
+</head>
+<body>
+  <h1>ComfyUI Image Enhance</h1>
+  <p>This plugin runs ComfyUI workflows directly from Krita to enhance the full image and optional region selections.</p>
+  <h2>Usage</h2>
+  <ol>
+    <li>Open Tools &gt; Scripts &gt; ComfyUI Image Enhance.</li>
+    <li>On the Server &amp; Workflows tab, set the ComfyUI server URL, workflows folder, and the global/region workflow file names.</li>
+    <li>On the Workflow tab, fill the global prompt and up to four region prompts (left to right order for regions), and add parameter names (e.g., <code>CFG.value</code>) and values for global and region runs. The “Copy global to region” button duplicates the list.</li>
+    <li>Optionally select one or more rectangular areas; each becomes a region pass. Without a selection only the global pass runs.</li>
+    <li>Click Go (global + regions) or Regions (regions only). The Log tab shows all settings, execution, and errors.</li>
+  </ol>
+  <h2>Notes</h2>
+  <ul>
+    <li>The prompt node in the workflow must be named <code>Prompt</code>. The image input node is detected automatically.</li>
+    <li>Results are added as new layers using the configured opacity; region layers inherit the selection position with a soft edge fade.</li>
+    <li>Use the Copy log button to put the full log into the clipboard for debugging.</li>
+    <li>Placeholders: you can reference <code>{width}</code>, <code>{height}</code>, and <code>{best-scale}</code> (computed as <code>clip(640/max(width,height), 0.2..1.0)</code>) inside prompts or parameter values; they are resolved per input image (global or region) before sending to ComfyUI.</li>
+    <li>Custom nodes required by <code>Universal.json</code>: ImpactConditionalBranch, ImpactImageInfo, ImpactCompare, ImpactLogicalOperators (from ComfyUI Impact Pack), BNK_TiledKSampler (from ComfyUI_TiledKSampler), and DZ_Face_Detailer (Face Detailer add-on). Install these extensions in ComfyUI to avoid “unknown node” errors.</li>
+  </ul>
+</body>
+</html>

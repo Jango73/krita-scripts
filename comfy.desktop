@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Service
 ServiceTypes=Krita/PythonPlugin
-X-KDE-Library=comfytiles
+X-KDE-Library=comfy
 X-Python-2-Compatible=false
 X-Krita-Manual=Manual.html
-Name=ComfyTiles
-Comment=Exports and imports tiles to/from ComfyUI
+Name=ComfyUI Image Enhance
+Comment=Enhance images via ComfyUI workflows from Krita
