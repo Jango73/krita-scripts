@@ -17,6 +17,7 @@ from .config_manager import (
     ConfigManager,
     DEFAULT_WORKFLOW_DIR,
     DEFAULT_GLOBAL_PARAMS,
+    DEFAULT_OUTPUT_DIR,
 )
 from .parameter_set_manager import ParameterSetManager
 
@@ -93,6 +94,8 @@ class ComfyUIEnhancer:
         self.dialog.server_edit.setText(self.config.data.get("server_url", ""))
         workflow_dir = self.config.data.get("workflows_dir") or DEFAULT_WORKFLOW_DIR
         self.dialog.workflow_dir_edit.setText(workflow_dir)
+        output_dir = self.config.data.get("output_dir") or DEFAULT_OUTPUT_DIR
+        self.dialog.output_dir_edit.setText(output_dir)
         self.dialog.global_workflow_edit.setText(self.config.data.get("workflow_global", "Universal.json"))
         self.dialog.region_workflow_edit.setText(self.config.data.get("workflow_region", "Universal.json"))
 
@@ -525,11 +528,13 @@ class ComfyUIEnhancer:
             entries = []
 
         candidate_dirs = []
-        plugin_output = os.path.abspath(os.path.join(os.path.dirname(__file__), "output"))
-        candidate_dirs.append(plugin_output)
-        home_default = os.path.join(os.path.expanduser("~"), "ComfyUI", "output")
-        if home_default not in candidate_dirs:
-            candidate_dirs.append(home_default)
+        output_dir = ""
+        if self.config:
+            output_dir = self.config.data.get("output_dir", "")
+        if not output_dir:
+            output_dir = DEFAULT_OUTPUT_DIR
+        if output_dir:
+            candidate_dirs.append(output_dir)
 
         for entry in entries:
             if not isinstance(entry, dict):
@@ -676,6 +681,7 @@ class ComfyUIEnhancer:
     def _log_settings(self, config: Dict[str, Any], prompts: Dict[str, Any], parameters: Dict[str, Any]) -> None:
         self._log(f"Server URL: {config.get('server_url')}")
         self._log(f"Workflows dir: {config.get('workflows_dir') or DEFAULT_WORKFLOW_DIR}")
+        self._log(f"Output dir: {config.get('output_dir') or DEFAULT_OUTPUT_DIR}")
         self._log(f"Workflow global: {config.get('workflow_global')}")
         self._log(f"Workflow region: {config.get('workflow_region')}")
         self._log(f"Global prompt: {prompts.get('global', [''])[0]}")

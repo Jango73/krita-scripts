@@ -6,6 +6,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 
 from .config_manager import (
     DEFAULT_WORKFLOW_DIR,
+    DEFAULT_OUTPUT_DIR,
     DEFAULT_GLOBAL_PARAMS,
     DEFAULT_SERVER_URL,
     DEFAULT_REGION_PARAMS,
@@ -123,6 +124,10 @@ class ComfyUIDialog(QtWidgets.QDialog):
         browse_dir = QtWidgets.QPushButton("Browse")
         browse_dir.clicked.connect(self._browse_workflow_dir)
 
+        self.output_dir_edit = QtWidgets.QLineEdit(DEFAULT_OUTPUT_DIR)
+        browse_output_dir = QtWidgets.QPushButton("Browse")
+        browse_output_dir.clicked.connect(self._browse_output_dir)
+
         self.global_workflow_edit = QtWidgets.QLineEdit("Universal.json")
         self.region_workflow_edit = QtWidgets.QLineEdit("Universal.json")
 
@@ -130,10 +135,14 @@ class ComfyUIDialog(QtWidgets.QDialog):
         layout.addWidget(self.workflow_dir_edit, 0, 1)
         layout.addWidget(browse_dir, 0, 2)
 
-        layout.addWidget(QtWidgets.QLabel("Global workflow name"), 1, 0)
-        layout.addWidget(self.global_workflow_edit, 1, 1, 1, 2)
-        layout.addWidget(QtWidgets.QLabel("Region workflow name"), 2, 0)
-        layout.addWidget(self.region_workflow_edit, 2, 1, 1, 2)
+        layout.addWidget(QtWidgets.QLabel("Output folder"), 1, 0)
+        layout.addWidget(self.output_dir_edit, 1, 1, 1, 2)
+        layout.addWidget(browse_output_dir, 1, 2)
+
+        layout.addWidget(QtWidgets.QLabel("Global workflow name"), 2, 0)
+        layout.addWidget(self.global_workflow_edit, 2, 1, 1, 2)
+        layout.addWidget(QtWidgets.QLabel("Region workflow name"), 3, 0)
+        layout.addWidget(self.region_workflow_edit, 3, 1, 1, 2)
         return group
 
     def _build_misc_group(self) -> QtWidgets.QGroupBox:
@@ -354,6 +363,11 @@ class ComfyUIDialog(QtWidgets.QDialog):
         if directory:
             self.workflow_dir_edit.setText(directory)
 
+    def _browse_output_dir(self) -> None:
+        directory = QtWidgets.QFileDialog.getExistingDirectory(self, "Select output folder")
+        if directory:
+            self.output_dir_edit.setText(directory)
+
     def get_parameters(self) -> Dict[str, List[Dict[str, str]]]:
         return {
             "global": self._read_table(self.global_params),
@@ -401,6 +415,7 @@ class ComfyUIDialog(QtWidgets.QDialog):
         return {
             "server_url": self.server_edit.text(),
             "workflows_dir": self.workflow_dir_edit.text(),
+            "output_dir": self.output_dir_edit.text(),
             "workflow_global": self.global_workflow_edit.text(),
             "workflow_region": self.region_workflow_edit.text(),
         }
@@ -576,6 +591,7 @@ class ComfyUIDialog(QtWidgets.QDialog):
             return
         self.server_edit.setText(DEFAULT_SERVER_URL)
         self.workflow_dir_edit.setText(DEFAULT_WORKFLOW_DIR)
+        self.output_dir_edit.setText(DEFAULT_OUTPUT_DIR)
         self.global_workflow_edit.setText("Universal.json")
         self.region_workflow_edit.setText("Universal.json")
         self.opacity_spin.setValue(0.8)

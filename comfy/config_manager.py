@@ -5,10 +5,20 @@ import os
 from pathlib import Path
 from typing import Dict, Optional, Callable, Any, List
 
+def _default_workflow_dir() -> str:
+    if os.name == "nt":
+        return str(Path.home() / "Documents" / "ComfyUI" / "user" / "default" / "workflows")
+    return "/comfy/workflows"
 
-DEFAULT_WORKFLOW_DIR = "/comfy/workflows"
-DEFAULT_OUTPUT_DIR = "/comfy/output"
+def _default_output_dir() -> str:
+    if os.name == "nt":
+        return str(Path.home() / "Documents" / "ComfyUI" / "output")
+    return "/comfy/output"
+
+DEFAULT_WORKFLOW_DIR = _default_workflow_dir()
+DEFAULT_OUTPUT_DIR = _default_output_dir()
 DEFAULT_SERVER_URL = "http://127.0.0.1:8188"
+
 DEFAULT_GLOBAL_PARAMS = [
     {"target": "Img2img", "value": "1"},
     {"target": "Reduce input", "value": "1"},
@@ -21,6 +31,7 @@ DEFAULT_GLOBAL_PARAMS = [
     {"target": "Steps", "value": "7"},
     {"target": "CFG", "value": "1.0"},
 ]
+
 DEFAULT_REGION_PARAMS = [
     {"target": "Img2img", "value": "1"},
     {"target": "Reduce input", "value": "1"},
@@ -34,9 +45,7 @@ DEFAULT_REGION_PARAMS = [
     {"target": "CFG", "value": "1.0"},
 ]
 
-
 DEFAULT_CONFIG_PATH = Path.home() / ".krita" / "comfy_config.json"
-
 
 class ConfigManager:
     """Load and save basic configuration values."""
@@ -47,6 +56,7 @@ class ConfigManager:
         self.data: Dict[str, Any] = {
             "server_url": DEFAULT_SERVER_URL,
             "workflows_dir": DEFAULT_WORKFLOW_DIR,
+            "output_dir": DEFAULT_OUTPUT_DIR,
             "workflow_global": "Universal.json",
             "workflow_region": "Universal.json",
             "params_global": [dict(p) for p in DEFAULT_GLOBAL_PARAMS],
@@ -68,8 +78,6 @@ class ConfigManager:
                         self.data[k] = self._normalize_params(v)
                     else:
                         self.data[k] = v
-            # Drop legacy entries we no longer support
-            self.data.pop("output_dir", None)
             self._write_log(
                 f"Loaded config: server={self.data.get('server_url')}, "
                 f"global wf={self.data.get('workflow_global')}, region wf={self.data.get('workflow_region')}, "
