@@ -457,6 +457,9 @@ class ComfyUIEnhancer:
                     injected = True
                     break
             if injected:
+                widgets = node.get("widgets_values")
+                if isinstance(widgets, list) and widgets:
+                    widgets[0] = prompt_text
                 node_name = node.get("name") or node.get("id") or node.get("type") or node.get("class_type") or "unknown"
                 self._log(f"Injected prompt into node '{node_name}' (list inputs).")
                 return

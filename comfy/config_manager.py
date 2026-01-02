@@ -26,10 +26,14 @@ DEFAULT_GLOBAL_PARAMS = [
     {"target": "Keep original size output", "value": "1"},
     {"target": "Refine stage 1", "value": "1"},
     {"target": "Refine stage 2", "value": "0"},
+    {"target": "Face detailer", "value": "0"},
     {"target": "Seed", "value": "0"},
-    {"target": "Denoise", "value": "0.2"},
     {"target": "Steps", "value": "7"},
     {"target": "CFG", "value": "1.0"},
+    {"target": "Denoise", "value": "0.2"},
+    {"target": "Refine steps", "value": "7"},
+    {"target": "Refine CFG", "value": "1.0"},
+    {"target": "Refine denoise", "value": "0.2"},
 ]
 
 DEFAULT_REGION_PARAMS = [
@@ -39,10 +43,14 @@ DEFAULT_REGION_PARAMS = [
     {"target": "Keep original size output", "value": "1"},
     {"target": "Refine stage 1", "value": "1"},
     {"target": "Refine stage 2", "value": "0"},
+    {"target": "Face detailer", "value": "0"},
     {"target": "Seed", "value": "0"},
-    {"target": "Denoise", "value": "0.2"},
     {"target": "Steps", "value": "7"},
     {"target": "CFG", "value": "1.0"},
+    {"target": "Denoise", "value": "0.2"},
+    {"target": "Refine steps", "value": "7"},
+    {"target": "Refine CFG", "value": "1.0"},
+    {"target": "Refine denoise", "value": "0.2"},
 ]
 
 DEFAULT_CONFIG_PATH = Path.home() / ".krita" / "comfy_config.json"
