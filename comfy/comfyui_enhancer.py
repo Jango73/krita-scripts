@@ -43,6 +43,8 @@ class ComfyUIEnhancer:
 
     def __init__(self, logger: Optional[Callable[[str], None]] = None):
         self._logger = logger
+        self._log_buffer: List[str] = []
+        self._max_log_entries = 1000
         self.dialog: Optional[ComfyUIDialog] = None
         self.client: Optional[ComfyUIClient] = None
         self.parser = WorkflowParser(logger=self._log)
@@ -50,43 +52,73 @@ class ComfyUIEnhancer:
         self.config = ConfigManager(logger=self._log)
         self.parameter_sets = ParameterSetManager(logger=self._log)
         self._cancel_requested = False
+        self.dock = None
+        self.workflow_pane = None
+        self._initialized = False
 
     def setup(self) -> None:
         """Setup plugin resources and UI hooks."""
-        self.prompts.load()
-        self.config.load()
-        self.parameter_sets.load()
+        self._ensure_initialized()
         self.dialog = ComfyUIDialog(logger=self._log, parameter_sets=self.parameter_sets)
         self._populate_prompts()
         self._populate_config()
         self._populate_parameters()
-        self.dialog.enhance_btn.clicked.connect(self._on_enhance_clicked)
-        self.dialog.enhance_regions_btn.clicked.connect(lambda: self._on_enhance_clicked(regions_only=True))
-        self.dialog.stop_btn.clicked.connect(self._on_stop_clicked)
-        self.dialog.cancel_btn.clicked.connect(self._on_cancel_clicked)
         self.dialog.finished.connect(self._on_dialog_closed)
+        self._flush_log_buffer()
 
     def unload(self) -> None:
         """Cleanup when the plugin is unloaded."""
         self.prompts.save()
         self.config.save()
 
+    def register_dock(self, dock) -> None:
+        """Attach the workflow dock and wire its signals."""
+        self._ensure_initialized()
+        self.dock = dock
+        self.workflow_pane = getattr(dock, "workflow_pane", None)
+        if self.workflow_pane:
+            self.workflow_pane.set_logger(self._log)
+            self.workflow_pane.set_parameter_manager(self.parameter_sets)
+            self.workflow_pane.enhance_requested.connect(self._on_enhance_clicked)
+            self.workflow_pane.stop_requested.connect(self._on_stop_clicked)
+            self.workflow_pane.settings_requested.connect(self.open_dialog)
+        self._populate_prompts()
+        self._populate_parameters()
+
     def open_dialog(self) -> None:
         """Display the dialog."""
         if self.dialog is None:
             self.setup()
+        else:
+            # Keep dialog in sync with the active workflow UI before showing
+            active_ui = self._active_workflow_ui()
+            dialog_pane = getattr(self.dialog, "workflow_pane", None)
+            if active_ui and dialog_pane is not active_ui:
+                try:
+                    self.dialog.set_prompts(active_ui.get_prompts())
+                    params = active_ui.get_parameters()
+                    params["opacity"] = self.config.data.get("opacity")
+                    params["fade_ratio"] = self.config.data.get("fade_ratio")
+                    self.dialog.set_parameters(params)
+                except Exception:
+                    pass
         if self.dialog:
             self.dialog.show()
             self.dialog.raise_()
             self.dialog.activateWindow()
 
     def _populate_prompts(self) -> None:
-        if not self.dialog:
-            return
-        self.dialog.global_prompt_edit.setText(self.prompts.global_prompt)
-        for idx, edit in enumerate(self.dialog.region_prompts_edits):
-            if idx < len(self.prompts.region_prompts):
-                edit.setText(self.prompts.region_prompts[idx])
+        prompts = {
+            "global": [self.prompts.global_prompt],
+            "regions": list(self.prompts.region_prompts),
+        }
+        if self.dialog and getattr(self.dialog, "set_prompts", None):
+            try:
+                self.dialog.set_prompts(prompts)
+            except Exception:
+                pass
+        if self.workflow_pane:
+            self.workflow_pane.set_prompts(prompts)
 
     def _populate_config(self) -> None:
         if not self.dialog:
@@ -100,8 +132,6 @@ class ComfyUIEnhancer:
         self.dialog.region_workflow_edit.setText(self.config.data.get("workflow_region", "Universal.json"))
 
     def _populate_parameters(self) -> None:
-        if not self.dialog:
-            return
         global_params = self.config.data.get("params_global") or [dict(p) for p in DEFAULT_GLOBAL_PARAMS]
         params = {
             "global": global_params,
@@ -109,58 +139,49 @@ class ComfyUIEnhancer:
             "opacity": self.config.data.get("opacity"),
             "fade_ratio": self.config.data.get("fade_ratio"),
         }
-        self.dialog.set_parameters(params)
+        if self.dialog and getattr(self.dialog, "set_parameters", None):
+            self.dialog.set_parameters(params)
+        if self.workflow_pane:
+            self.workflow_pane.set_parameters(params)
 
     def _on_enhance_clicked(self, regions_only: bool = False) -> None:
-        if not self.dialog:
-            return
-        # Separator to delineate runs in the log
-        self._log("-" * 60)
+        self._ensure_initialized()
         self._cancel_requested = False
         self._set_running(True)
         self._set_status("Starting...")
-        config = self.dialog.get_config()
-        prompts = self.dialog.get_prompts()
-        parameters = self.dialog.get_parameters()
-
-        if not config.get("workflows_dir"):
-            config["workflows_dir"] = DEFAULT_WORKFLOW_DIR
-        # Resolve special plugin-relative paths like "/comfy/..."
-        config["workflows_dir"] = self._resolve_path(config["workflows_dir"])
-        # Keep resolved paths in memory so temp helpers use them
-        self.config.data["workflows_dir"] = config["workflows_dir"]
+        config = self._get_config()
+        prompts = self._get_prompts()
+        parameters = self._get_parameters()
 
         self._log_settings(config, prompts, parameters)
-
-        self._persist_dialog_state()
+        self._persist_state(prompts, parameters, config)
 
         self.client = self._create_client(config["server_url"])
         if regions_only:
-            self.dialog.append_log("Starting region-only enhance...")
+            self._append_log("Starting region-only enhance...")
             self._set_status("Running (regions)")
         else:
-            self.dialog.append_log("Starting image enhance...")
+            self._append_log("Starting image enhance...")
             self._set_status("Running (global + regions)")
         try:
             self._run_enhance(config, prompts, parameters, regions_only=regions_only)
-            self.dialog.append_log("Enhance completed.")
-            try:
-                self.dialog.accept()
-            except Exception:
-                pass
+            self._append_log("Enhance completed.")
             self._set_status("Done")
         except Exception as exc:
-            self.dialog.append_log(f"Enhance failed: {exc}")
+            self._append_log(f"Enhance failed: {exc}")
             self._set_status("Failed")
         finally:
             self._set_running(False)
             self._cancel_requested = False
 
     def _on_cancel_clicked(self) -> None:
+        self._cancel_requested = True
+        self._persist_state()
         if self.dialog:
-            self._cancel_requested = True
-            self._persist_dialog_state()
-            self.dialog.reject()
+            try:
+                self.dialog.reject()
+            except Exception:
+                pass
 
     def _on_stop_clicked(self) -> None:
         self._cancel_requested = True
@@ -172,14 +193,17 @@ class ComfyUIEnhancer:
                 pass
 
     def _on_dialog_closed(self) -> None:
-        self._persist_dialog_state()
+        self._persist_state()
 
-    def _persist_dialog_state(self) -> None:
-        if not self.dialog:
-            return
-        config = self.dialog.get_config()
-        prompts = self.dialog.get_prompts()
-        parameters = self.dialog.get_parameters()
+    def _persist_state(
+        self,
+        prompts: Optional[Dict[str, List[str]]] = None,
+        parameters: Optional[Dict[str, Any]] = None,
+        config: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        prompts = prompts or self._get_prompts()
+        parameters = parameters or self._get_parameters()
+        config = config or self._get_config()
 
         if not config.get("workflows_dir"):
             config["workflows_dir"] = DEFAULT_WORKFLOW_DIR
@@ -197,6 +221,62 @@ class ComfyUIEnhancer:
         if "fade_ratio" in parameters:
             self.config.data["fade_ratio"] = parameters.get("fade_ratio")
         self.config.save()
+
+    def _active_workflow_ui(self):
+        if self.dock and getattr(self.dock, "workflow_pane", None):
+            return self.dock.workflow_pane
+        return None
+
+    def _get_prompts(self) -> Dict[str, List[str]]:
+        ui = self._active_workflow_ui()
+        if ui:
+            return ui.get_prompts()
+        return {
+            "global": [self.prompts.global_prompt],
+            "regions": list(self.prompts.region_prompts),
+        }
+
+    def _get_parameters(self) -> Dict[str, Any]:
+        ui = self._active_workflow_ui()
+        params = ui.get_parameters() if ui else {"global": [], "regions": []}
+        if "opacity" not in params:
+            params["opacity"] = self.config.data.get("opacity")
+        if "fade_ratio" not in params:
+            params["fade_ratio"] = self.config.data.get("fade_ratio")
+        return params
+
+    def _get_config(self) -> Dict[str, Any]:
+        if self.dialog:
+            config = self.dialog.get_config()
+        else:
+            config = {
+                "server_url": self.config.data.get("server_url", ""),
+                "workflows_dir": self.config.data.get("workflows_dir") or DEFAULT_WORKFLOW_DIR,
+                "output_dir": self.config.data.get("output_dir") or DEFAULT_OUTPUT_DIR,
+                "workflow_global": self.config.data.get("workflow_global", "Universal.json"),
+                "workflow_region": self.config.data.get("workflow_region", "Universal.json"),
+            }
+        if not config.get("workflows_dir"):
+            config["workflows_dir"] = DEFAULT_WORKFLOW_DIR
+        config["workflows_dir"] = self._resolve_path(config["workflows_dir"])
+        self.config.data["workflows_dir"] = config["workflows_dir"]
+        if not config.get("output_dir"):
+            config["output_dir"] = DEFAULT_OUTPUT_DIR
+        config["output_dir"] = self._resolve_path(config["output_dir"])
+        self.config.data["output_dir"] = config["output_dir"]
+        return config
+
+    def _append_log(self, message: str) -> None:
+        echo = self.dialog is None
+        self._write_log_entry(message, echo=echo)
+
+    def _ensure_initialized(self) -> None:
+        if self._initialized:
+            return
+        self.prompts.load()
+        self.config.load()
+        self.parameter_sets.load()
+        self._initialized = True
 
     def _run_enhance(self, config: Dict[str, Any], prompts: Dict[str, Any], parameters: Dict[str, Any], regions_only: bool = False) -> None:
         doc = self._get_document()
@@ -693,6 +773,10 @@ class ComfyUIEnhancer:
             self._log(f"Region prompt {idx + 1}: {p}")
 
     def _log(self, message: str) -> None:
+        self._write_log_entry(message, echo=True)
+
+    def _write_log_entry(self, message: str, echo: bool = True) -> None:
+        self._record_log(message)
         # Avoid echo loops by writing to dialog only when not already inside dialog logging
         if message == "__PENDING_DOT__":
             # Inline dot without extra newline
@@ -702,10 +786,11 @@ class ComfyUIEnhancer:
                 except Exception:
                     pass
             return
-        if self._logger:
-            self._logger(message)
-        else:
-            print(message)
+        if echo:
+            if self._logger:
+                self._logger(message)
+            else:
+                print(message)
         # Write to dialog log last to avoid feedback loops if logger points to dialog
         if self.dialog and hasattr(self.dialog, "append_log"):
             try:
@@ -715,10 +800,37 @@ class ComfyUIEnhancer:
             finally:
                 self.dialog._log_guard = False
 
+    def _record_log(self, message: str) -> None:
+        self._log_buffer.append(message)
+        if len(self._log_buffer) > self._max_log_entries:
+            self._log_buffer = self._log_buffer[-self._max_log_entries :]
+
+    def _flush_log_buffer(self) -> None:
+        if not self.dialog:
+            return
+        for entry in self._log_buffer:
+            if entry == "__PENDING_DOT__":
+                if hasattr(self.dialog, "append_log_dot"):
+                    try:
+                        self.dialog.append_log_dot()
+                    except Exception:
+                        pass
+            else:
+                try:
+                    self.dialog.append_log(entry)
+                except Exception:
+                    pass
+
     def _set_status(self, message: str) -> None:
         if self.dialog and hasattr(self.dialog, "set_status"):
             try:
                 self.dialog.set_status(message)
+            except Exception:
+                pass
+        ui = self._active_workflow_ui()
+        if ui:
+            try:
+                ui.set_status(message)
             except Exception:
                 pass
 
@@ -726,6 +838,12 @@ class ComfyUIEnhancer:
         if self.dialog and hasattr(self.dialog, "set_running"):
             try:
                 self.dialog.set_running(running)
+            except Exception:
+                pass
+        ui = self._active_workflow_ui()
+        if ui:
+            try:
+                ui.set_running(running)
             except Exception:
                 pass
 

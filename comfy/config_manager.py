@@ -13,7 +13,7 @@ def _default_workflow_dir() -> str:
 def _default_output_dir() -> str:
     if os.name == "nt":
         return str(Path.home() / "Documents" / "ComfyUI" / "output")
-    return "/comfy/output"
+    return str(Path.home() / "ComfyUI" / "output")
 
 DEFAULT_WORKFLOW_DIR = _default_workflow_dir()
 DEFAULT_OUTPUT_DIR = _default_output_dir()
