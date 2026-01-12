@@ -67,7 +67,7 @@ class ComfyUIDialog(QtWidgets.QDialog):
         manual_layout.addWidget(self._build_manual_group())
 
         self.tabs.addTab(manual_tab, "Manual")
-        self.tabs.addTab(server_tab, "Server & Workflows")
+        self.tabs.addTab(server_tab, "Settings")
         self.log_tab_index = self.tabs.addTab(log_tab, "Log")
 
         main_layout.addWidget(self.tabs)

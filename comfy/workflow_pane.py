@@ -94,14 +94,32 @@ class WorkflowPane(QtWidgets.QWidget):
         line_height = self.global_prompt_edit.fontMetrics().lineSpacing()
         self.global_prompt_edit.setFixedHeight(line_height * 2 + 10)
         layout.addWidget(QtWidgets.QLabel("Global prompt"), 0, 0)
-        layout.addWidget(self.global_prompt_edit, 0, 1)
+        layout.addLayout(
+            self._build_prompt_editor_row(
+                self.global_prompt_edit,
+                "Global prompt editor",
+                self.global_prompt_edit.toPlainText,
+                self.global_prompt_edit.setPlainText,
+            ),
+            0,
+            1,
+        )
 
         self.region_prompts_edits: List[QtWidgets.QLineEdit] = []
         for idx in range(4):
             edit = QtWidgets.QLineEdit()
             self.region_prompts_edits.append(edit)
             layout.addWidget(QtWidgets.QLabel(f"Region prompt {idx + 1}"), idx + 1, 0)
-            layout.addWidget(edit, idx + 1, 1)
+            layout.addLayout(
+                self._build_prompt_editor_row(
+                    edit,
+                    f"Region prompt {idx + 1} editor",
+                    edit.text,
+                    edit.setText,
+                ),
+                idx + 1,
+                1,
+            )
         return group
 
     def _build_parameters_group(self) -> QtWidgets.QGroupBox:
@@ -176,6 +194,43 @@ class WorkflowPane(QtWidgets.QWidget):
         layout.addWidget(self.status_label)
         layout.addStretch(1)
         return layout
+
+    def _build_prompt_editor_row(
+        self,
+        edit_widget: QtWidgets.QWidget,
+        title: str,
+        get_text: Callable[[], str],
+        set_text: Callable[[str], None],
+    ) -> QtWidgets.QHBoxLayout:
+        row = QtWidgets.QHBoxLayout()
+        row.addWidget(edit_widget)
+        editor_btn = QtWidgets.QToolButton()
+        editor_btn.setText("...")
+        editor_btn.setToolTip("Edit prompt in a modal dialog")
+        editor_btn.clicked.connect(lambda: self._open_prompt_editor(title, get_text, set_text))
+        row.addWidget(editor_btn)
+        return row
+
+    def _open_prompt_editor(
+        self,
+        title: str,
+        get_text: Callable[[], str],
+        set_text: Callable[[str], None],
+    ) -> None:
+        dialog = QtWidgets.QDialog(self)
+        dialog.setWindowTitle(title)
+        dialog.setModal(True)
+        layout = QtWidgets.QVBoxLayout(dialog)
+        text_edit = QtWidgets.QPlainTextEdit()
+        text_edit.setPlainText(get_text())
+        text_edit.setMinimumSize(480, 220)
+        layout.addWidget(text_edit)
+        buttons = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        layout.addWidget(buttons)
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            set_text(text_edit.toPlainText())
 
     def _make_param_table(self) -> QtWidgets.QTableWidget:
         table = QtWidgets.QTableWidget(0, 2)
