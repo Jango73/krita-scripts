@@ -17,6 +17,8 @@ from .parameter_set_manager import ParameterSetManager
 class ComfyUIDialog(QtWidgets.QDialog):
     """Main dialog handling configuration, prompts, and execution."""
 
+    reset_defaults_requested = QtCore.pyqtSignal()
+
     def __init__(
         self,
         parent: Optional[QtWidgets.QWidget] = None,
@@ -270,4 +272,4 @@ class ComfyUIDialog(QtWidgets.QDialog):
         self.region_workflow_edit.setText("Universal.json")
         self.opacity_spin.setValue(0.8)
         self.fade_spin.setValue(0.1)
-        # Workflow parameters now live in the dock pane; nothing to reset here.
+        self.reset_defaults_requested.emit()

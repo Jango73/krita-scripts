@@ -17,6 +17,7 @@ from .config_manager import (
     ConfigManager,
     DEFAULT_WORKFLOW_DIR,
     DEFAULT_GLOBAL_PARAMS,
+    DEFAULT_REGION_PARAMS,
     DEFAULT_OUTPUT_DIR,
 )
 from .parameter_set_manager import ParameterSetManager
@@ -60,6 +61,7 @@ class ComfyUIEnhancer:
         """Setup plugin resources and UI hooks."""
         self._ensure_initialized()
         self.dialog = ComfyUIDialog(logger=self._log, parameter_sets=self.parameter_sets)
+        self.dialog.reset_defaults_requested.connect(self._on_reset_defaults)
         self._populate_prompts()
         self._populate_config()
         self._populate_parameters()
@@ -132,7 +134,8 @@ class ComfyUIEnhancer:
         self.dialog.region_workflow_edit.setText(self.config.data.get("workflow_region", "Universal.json"))
 
     def _populate_parameters(self) -> None:
-        global_params = self.config.data.get("params_global") or [dict(p) for p in DEFAULT_GLOBAL_PARAMS]
+        defaults = self._default_parameters_payload()
+        global_params = self.config.data.get("params_global") or defaults["global"]
         params = {
             "global": global_params,
             "regions": self.config.data.get("params_region") or [],
@@ -194,6 +197,19 @@ class ComfyUIEnhancer:
 
     def _on_dialog_closed(self) -> None:
         self._persist_state()
+
+    def _default_parameters_payload(self) -> Dict[str, List[Dict[str, str]]]:
+        return {
+            "global": [dict(p) for p in DEFAULT_GLOBAL_PARAMS],
+            "regions": [dict(p) for p in DEFAULT_REGION_PARAMS],
+        }
+
+    def _on_reset_defaults(self) -> None:
+        defaults = self._default_parameters_payload()
+        self.config.data["params_global"] = defaults["global"]
+        self.config.data["params_region"] = defaults["regions"]
+        if self.workflow_pane:
+            self.workflow_pane.set_parameters(self._default_parameters_payload())
 
     def _persist_state(
         self,
