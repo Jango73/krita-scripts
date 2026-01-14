@@ -1,6 +1,6 @@
 """Shared workflow UI pane for dock and dialog."""
 
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 from PyQt5 import QtWidgets, QtCore
 
 from .parameter_set_manager import ParameterSetManager
@@ -22,6 +22,13 @@ class WorkflowPane(QtWidgets.QWidget):
         super().__init__(parent)
         self._logger = logger
         self.parameter_sets = parameter_sets
+        self._mode = "advanced"
+        self._params_by_mode = {
+            "simple": {"global": [], "regions": []},
+            "advanced": {"global": [], "regions": []},
+        }
+        self._simple_params_visible = False
+        self._prompt_editor_buttons: List[QtWidgets.QToolButton] = []
         self._build_ui()
         self._init_parameter_sets_ui()
 
@@ -41,18 +48,27 @@ class WorkflowPane(QtWidgets.QWidget):
 
         inner = QtWidgets.QWidget()
         inner_layout = QtWidgets.QVBoxLayout(inner)
+        inner_layout.addLayout(self._build_mode_toggle_row())
+        self.simple_controls_group = self._build_simple_controls_group()
+        inner_layout.addWidget(self.simple_controls_group)
         inner_layout.addWidget(self._build_parameter_sets_group())
-        inner_layout.addWidget(self._build_prompts_group())
-        inner_layout.addWidget(self._build_parameters_group())
+        inner_layout.addLayout(self._build_show_hide_row())
+        self.prompts_group = self._build_prompts_group()
+        inner_layout.addWidget(self.prompts_group)
+        self.parameters_group = self._build_parameters_group()
+        inner_layout.addWidget(self.parameters_group)
         inner_layout.addStretch(1)
         scroll.setWidget(inner)
 
         layout.addWidget(scroll)
         layout.addLayout(self._build_status_bar())
         layout.addLayout(self._build_actions())
+        self._apply_mode_ui()
+        self._schedule_param_resize()
 
     def _build_parameter_sets_group(self) -> QtWidgets.QGroupBox:
         group = QtWidgets.QGroupBox("Parameter sets")
+        group.setFixedHeight(200)
         layout = QtWidgets.QVBoxLayout(group)
 
         self.parameter_sets_list = QtWidgets.QListWidget()
@@ -85,6 +101,22 @@ class WorkflowPane(QtWidgets.QWidget):
         btn_row.addLayout(bottom_row)
         layout.addLayout(btn_row)
         return group
+
+    def _build_mode_toggle_row(self) -> QtWidgets.QHBoxLayout:
+        row = QtWidgets.QHBoxLayout()
+        self.mode_toggle_btn = QtWidgets.QPushButton()
+        self.mode_toggle_btn.clicked.connect(self._toggle_mode)
+        row.addWidget(self.mode_toggle_btn)
+        row.addStretch(1)
+        return row
+
+    def _build_show_hide_row(self) -> QtWidgets.QHBoxLayout:
+        row = QtWidgets.QHBoxLayout()
+        self.toggle_params_btn = QtWidgets.QPushButton()
+        self.toggle_params_btn.clicked.connect(self._toggle_params_visibility)
+        row.addWidget(self.toggle_params_btn)
+        row.addStretch(1)
+        return row
 
     def _build_prompts_group(self) -> QtWidgets.QGroupBox:
         group = QtWidgets.QGroupBox("Prompts")
@@ -122,48 +154,80 @@ class WorkflowPane(QtWidgets.QWidget):
             )
         return group
 
-    def _build_parameters_group(self) -> QtWidgets.QGroupBox:
-        group = QtWidgets.QGroupBox("Workflow parameters")
+    def _build_simple_controls_group(self) -> QtWidgets.QGroupBox:
+        group = QtWidgets.QGroupBox("Simple controls")
         layout = QtWidgets.QGridLayout(group)
+        self.enhance_slider, enhance_spin = self._build_slider_row(0, 100, 20)
+        self.random_seed_slider, seed_spin = self._build_slider_row(0, 10000, 0)
+        layout.addWidget(QtWidgets.QLabel("Enhance"), 0, 0)
+        layout.addWidget(self.enhance_slider, 0, 1)
+        layout.addWidget(enhance_spin, 0, 2)
+        layout.addWidget(QtWidgets.QLabel("Random Seed"), 1, 0)
+        layout.addWidget(self.random_seed_slider, 1, 1)
+        layout.addWidget(seed_spin, 1, 2)
+        layout.setColumnStretch(1, 1)
+        return group
+
+    def _build_slider_row(
+        self,
+        minimum: int,
+        maximum: int,
+        default: int,
+    ) -> Tuple[QtWidgets.QSlider, QtWidgets.QSpinBox]:
+        slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        slider.setRange(minimum, maximum)
+        slider.setValue(default)
+        spin = QtWidgets.QSpinBox()
+        spin.setRange(minimum, maximum)
+        spin.setValue(default)
+        slider.valueChanged.connect(spin.setValue)
+        spin.valueChanged.connect(slider.setValue)
+        return slider, spin
+
+    def _build_parameters_group(self) -> QtWidgets.QGroupBox:
+        self.parameters_group = QtWidgets.QGroupBox("Workflow parameters")
+        layout = QtWidgets.QGridLayout(self.parameters_group)
 
         self.global_params = self._make_param_table()
-        add_global = QtWidgets.QPushButton("Add")
-        remove_global = QtWidgets.QPushButton("Remove")
-        clear_global = QtWidgets.QPushButton("Clear")
-        add_global.clicked.connect(lambda: self._add_param_row(self.global_params))
-        remove_global.clicked.connect(lambda: self._remove_param_row(self.global_params))
-        clear_global.clicked.connect(lambda: self._confirm_and_clear(self.global_params, "Clear global parameters?"))
+        self.add_global_btn = QtWidgets.QPushButton("Add")
+        self.remove_global_btn = QtWidgets.QPushButton("Remove")
+        self.clear_global_btn = QtWidgets.QPushButton("Clear")
+        self.add_global_btn.clicked.connect(lambda: self._add_param_row(self.global_params))
+        self.remove_global_btn.clicked.connect(lambda: self._remove_param_row(self.global_params))
+        self.clear_global_btn.clicked.connect(lambda: self._confirm_and_clear(self.global_params, "Clear global parameters?"))
         global_btn_row = QtWidgets.QHBoxLayout()
-        global_btn_row.addWidget(add_global)
-        global_btn_row.addWidget(remove_global)
-        global_btn_row.addWidget(clear_global)
+        global_btn_row.addWidget(self.add_global_btn)
+        global_btn_row.addWidget(self.remove_global_btn)
+        global_btn_row.addWidget(self.clear_global_btn)
         global_btn_row.addStretch(1)
 
         self.region_params = self._make_param_table()
-        add_region = QtWidgets.QPushButton("Add")
-        remove_region = QtWidgets.QPushButton("Remove")
-        clear_region = QtWidgets.QPushButton("Clear")
-        add_region.clicked.connect(lambda: self._add_param_row(self.region_params))
-        remove_region.clicked.connect(lambda: self._remove_param_row(self.region_params))
-        clear_region.clicked.connect(lambda: self._confirm_and_clear(self.region_params, "Clear region parameters?"))
+        self.add_region_btn = QtWidgets.QPushButton("Add")
+        self.remove_region_btn = QtWidgets.QPushButton("Remove")
+        self.clear_region_btn = QtWidgets.QPushButton("Clear")
+        self.add_region_btn.clicked.connect(lambda: self._add_param_row(self.region_params))
+        self.remove_region_btn.clicked.connect(lambda: self._remove_param_row(self.region_params))
+        self.clear_region_btn.clicked.connect(lambda: self._confirm_and_clear(self.region_params, "Clear region parameters?"))
         region_btn_row = QtWidgets.QHBoxLayout()
-        region_btn_row.addWidget(add_region)
-        region_btn_row.addWidget(remove_region)
-        region_btn_row.addWidget(clear_region)
+        region_btn_row.addWidget(self.add_region_btn)
+        region_btn_row.addWidget(self.remove_region_btn)
+        region_btn_row.addWidget(self.clear_region_btn)
         region_btn_row.addStretch(1)
-        copy_global_to_region = QtWidgets.QPushButton("Copy global to region")
-        copy_global_to_region.clicked.connect(self._copy_global_params_to_region)
+        self.copy_global_to_region_btn = QtWidgets.QPushButton("Copy global to region")
+        self.copy_global_to_region_btn.clicked.connect(self._copy_global_params_to_region)
 
-        layout.addWidget(QtWidgets.QLabel("Global parameters"), 0, 0)
+        self.global_params_label = QtWidgets.QLabel("Global parameters")
+        self.region_params_label = QtWidgets.QLabel("Region parameters")
+        layout.addWidget(self.global_params_label, 0, 0)
         layout.addWidget(self.global_params, 1, 0, 1, 2)
         layout.addLayout(global_btn_row, 2, 0, 1, 2)
 
-        layout.addWidget(QtWidgets.QLabel("Region parameters"), 3, 0)
+        layout.addWidget(self.region_params_label, 3, 0)
         layout.addWidget(self.region_params, 4, 0, 1, 2)
         layout.addLayout(region_btn_row, 5, 0, 1, 2)
-        layout.addWidget(copy_global_to_region, 6, 0, 1, 2)
+        layout.addWidget(self.copy_global_to_region_btn, 6, 0, 1, 2)
 
-        return group
+        return self.parameters_group
 
     def _build_actions(self) -> QtWidgets.QHBoxLayout:
         layout = QtWidgets.QVBoxLayout()
@@ -209,6 +273,7 @@ class WorkflowPane(QtWidgets.QWidget):
         editor_btn.setToolTip("Edit prompt in a modal dialog")
         editor_btn.clicked.connect(lambda: self._open_prompt_editor(title, get_text, set_text))
         row.addWidget(editor_btn)
+        self._prompt_editor_buttons.append(editor_btn)
         return row
 
     def _open_prompt_editor(
@@ -318,15 +383,155 @@ class WorkflowPane(QtWidgets.QWidget):
             value = regions[idx] if idx < len(regions) else ""
             edit.setText(value or "")
 
-    def get_parameters(self) -> Dict[str, List[Dict[str, str]]]:
+    def get_mode(self) -> str:
+        return self._mode
+
+    def set_mode(self, mode: str) -> None:
+        if mode not in ("simple", "advanced"):
+            mode = "advanced"
+        if self._mode == mode:
+            return
+        self._snapshot_current_params()
+        self._mode = mode
+        self._apply_mode_ui()
+        self._load_mode_params(mode)
+
+    def get_simple_values(self) -> Dict[str, int]:
         return {
+            "enhance_value": self.enhance_slider.value(),
+            "random_seed": self.random_seed_slider.value(),
+        }
+
+    def set_simple_values(self, enhance_value: int, random_seed: int) -> None:
+        self.enhance_slider.setValue(int(enhance_value))
+        self.random_seed_slider.setValue(int(random_seed))
+
+    def get_parameters(self) -> Dict[str, List[Dict[str, str]]]:
+        self._snapshot_current_params()
+        params = self._params_by_mode.get(self._mode, {"global": [], "regions": []})
+        return {
+            "global": list(params.get("global", [])),
+            "regions": list(params.get("regions", [])),
+        }
+
+    def set_parameters(self, params: Dict[str, List[Dict[str, str]]]) -> None:
+        self._params_by_mode[self._mode] = {
+            "global": list(params.get("global", [])),
+            "regions": list(params.get("regions", [])),
+        }
+        self._fill_table(self.global_params, params.get("global", []))
+        self._fill_table(self.region_params, params.get("regions", []))
+
+    def get_all_parameters(self) -> Dict[str, Dict[str, List[Dict[str, str]]]]:
+        self._snapshot_current_params()
+        return {
+            "simple": {
+                "global": list(self._params_by_mode.get("simple", {}).get("global", [])),
+                "regions": list(self._params_by_mode.get("simple", {}).get("regions", [])),
+            },
+            "advanced": {
+                "global": list(self._params_by_mode.get("advanced", {}).get("global", [])),
+                "regions": list(self._params_by_mode.get("advanced", {}).get("regions", [])),
+            },
+        }
+
+    def set_all_parameters(
+        self,
+        params_simple: Dict[str, List[Dict[str, str]]],
+        params_advanced: Dict[str, List[Dict[str, str]]],
+        mode: str,
+    ) -> None:
+        self._params_by_mode = {
+            "simple": {
+                "global": list(params_simple.get("global", [])),
+                "regions": list(params_simple.get("regions", [])),
+            },
+            "advanced": {
+                "global": list(params_advanced.get("global", [])),
+                "regions": list(params_advanced.get("regions", [])),
+            },
+        }
+        self._mode = "advanced" if mode not in ("simple", "advanced") else mode
+        self._apply_mode_ui()
+        self._load_mode_params(self._mode)
+
+    def _snapshot_current_params(self) -> None:
+        if not hasattr(self, "global_params") or not hasattr(self, "region_params"):
+            return
+        self._params_by_mode[self._mode] = {
             "global": self._read_table(self.global_params),
             "regions": self._read_table(self.region_params),
         }
 
-    def set_parameters(self, params: Dict[str, List[Dict[str, str]]]) -> None:
+    def _load_mode_params(self, mode: str) -> None:
+        params = self._params_by_mode.get(mode)
+        if not params:
+            return
         self._fill_table(self.global_params, params.get("global", []))
         self._fill_table(self.region_params, params.get("regions", []))
+
+    def _toggle_mode(self) -> None:
+        next_mode = "simple" if self._mode == "advanced" else "advanced"
+        self.set_mode(next_mode)
+
+    def _apply_mode_ui(self) -> None:
+        if not hasattr(self, "prompts_group"):
+            return
+        is_simple = self._mode == "simple"
+        self.simple_controls_group.setVisible(is_simple)
+        self.toggle_params_btn.setVisible(is_simple)
+        if is_simple:
+            self._set_params_visibility(self._simple_params_visible)
+        else:
+            self.prompts_group.setVisible(True)
+            self.parameters_group.setVisible(True)
+        self._set_prompt_editors_enabled(not is_simple)
+        self._set_parameters_enabled(not is_simple)
+        self._update_mode_button()
+        self._schedule_param_resize()
+
+    def _toggle_params_visibility(self) -> None:
+        self._set_params_visibility(not self._simple_params_visible)
+
+    def _set_params_visibility(self, visible: bool) -> None:
+        self._simple_params_visible = visible
+        self.prompts_group.setVisible(visible)
+        self.parameters_group.setVisible(visible)
+        self._update_toggle_params_btn()
+        self._schedule_param_resize()
+
+    def _update_toggle_params_btn(self) -> None:
+        if not hasattr(self, "toggle_params_btn"):
+            return
+        self.toggle_params_btn.setText("Hide parameters" if self._simple_params_visible else "Show parameters")
+
+    def _update_mode_button(self) -> None:
+        if not hasattr(self, "mode_toggle_btn"):
+            return
+        label = "Simple" if self._mode == "simple" else "Advanced"
+        self.mode_toggle_btn.setText(f"Mode: {label}")
+
+    def _set_parameters_enabled(self, enabled: bool) -> None:
+        widgets = [
+            getattr(self, "global_params", None),
+            getattr(self, "region_params", None),
+            getattr(self, "add_global_btn", None),
+            getattr(self, "remove_global_btn", None),
+            getattr(self, "clear_global_btn", None),
+            getattr(self, "add_region_btn", None),
+            getattr(self, "remove_region_btn", None),
+            getattr(self, "clear_region_btn", None),
+            getattr(self, "copy_global_to_region_btn", None),
+            getattr(self, "global_params_label", None),
+            getattr(self, "region_params_label", None),
+        ]
+        for widget in widgets:
+            if widget:
+                widget.setEnabled(enabled)
+
+    def _set_prompt_editors_enabled(self, enabled: bool) -> None:
+        for button in self._prompt_editor_buttons:
+            button.setEnabled(enabled)
 
     def set_running(self, running: bool) -> None:
         if running:
@@ -369,6 +574,7 @@ class WorkflowPane(QtWidgets.QWidget):
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
         self._resize_param_tables()
+        self._schedule_param_resize()
 
     def _resize_param_tables(self) -> None:
         for table in (getattr(self, "global_params", None), getattr(self, "region_params", None)):
@@ -381,6 +587,17 @@ class WorkflowPane(QtWidgets.QWidget):
             right_width = max(1, width - left_width)
             table.setColumnWidth(0, left_width)
             table.setColumnWidth(1, right_width)
+
+    def _schedule_param_resize(self) -> None:
+        if hasattr(self, "_resize_pending") and self._resize_pending:
+            return
+        self._resize_pending = True
+
+        def _run() -> None:
+            self._resize_pending = False
+            self._resize_param_tables()
+
+        QtCore.QTimer.singleShot(0, _run)
 
     def _refresh_parameter_sets_list(self) -> None:
         if not self.parameter_sets or not hasattr(self, "parameter_sets_list"):
@@ -413,12 +630,17 @@ class WorkflowPane(QtWidgets.QWidget):
 
     def _save_parameter_set(self, name: str) -> None:
         prompts = self.get_prompts()
-        params = self.get_parameters()
+        all_params = self.get_all_parameters()
+        simple_values = self.get_simple_values()
         payload = {
-            "global": params.get("global", []),
-            "regions": params.get("regions", []),
+            "mode": self.get_mode(),
+            "prompts": prompts,
+            "params_simple": all_params.get("simple", {}),
+            "params_advanced": all_params.get("advanced", {}),
+            "enhance_value": simple_values.get("enhance_value", 20),
+            "random_seed": simple_values.get("random_seed", 0),
         }
-        self.parameter_sets.save_set(name, prompts, payload)
+        self.parameter_sets.save_set(name, payload)
         self._refresh_parameter_sets_list()
         self._write_log(f"Saved parameter set '{name}'")
 
@@ -432,12 +654,15 @@ class WorkflowPane(QtWidgets.QWidget):
         if not data:
             return
         prompts = data.get("prompts") or {}
-        params = data.get("params") or {}
+        params_advanced = data.get("params_advanced") or data.get("params") or {}
+        params_simple = data.get("params_simple") or params_advanced
+        mode = data.get("mode") or "advanced"
         self.set_prompts(prompts)
-        self.set_parameters({
-            "global": params.get("global", []),
-            "regions": params.get("regions", []),
-        })
+        self.set_all_parameters(params_simple, params_advanced, mode)
+        self.set_simple_values(
+            data.get("enhance_value", 20),
+            data.get("random_seed", 0),
+        )
         self._write_log(f"Loaded parameter set '{name}'")
 
     def _delete_selected_set(self) -> None:

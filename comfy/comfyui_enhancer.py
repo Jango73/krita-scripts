@@ -18,6 +18,8 @@ from .config_manager import (
     DEFAULT_WORKFLOW_DIR,
     DEFAULT_GLOBAL_PARAMS,
     DEFAULT_REGION_PARAMS,
+    DEFAULT_GLOBAL_PARAMS_SIMPLE,
+    DEFAULT_REGION_PARAMS_SIMPLE,
     DEFAULT_OUTPUT_DIR,
 )
 from .parameter_set_manager import ParameterSetManager
@@ -135,26 +137,56 @@ class ComfyUIEnhancer:
 
     def _populate_parameters(self) -> None:
         defaults = self._default_parameters_payload()
-        global_params = self.config.data.get("params_global") or defaults["global"]
+        params_advanced = {
+            "global": self.config.data.get("params_global_advanced") or defaults["advanced"]["global"],
+            "regions": self.config.data.get("params_region_advanced") or defaults["advanced"]["regions"],
+        }
+        params_simple = {
+            "global": self.config.data.get("params_global_simple") or defaults["simple"]["global"],
+            "regions": self.config.data.get("params_region_simple") or defaults["simple"]["regions"],
+        }
         params = {
-            "global": global_params,
-            "regions": self.config.data.get("params_region") or [],
+            "global": params_advanced["global"],
+            "regions": params_advanced["regions"],
             "opacity": self.config.data.get("opacity"),
             "fade_ratio": self.config.data.get("fade_ratio"),
         }
         if self.dialog and getattr(self.dialog, "set_parameters", None):
             self.dialog.set_parameters(params)
         if self.workflow_pane:
-            self.workflow_pane.set_parameters(params)
+            self.workflow_pane.set_all_parameters(
+                params_simple=params_simple,
+                params_advanced=params_advanced,
+                mode=self.config.data.get("mode", "advanced"),
+            )
+            self.workflow_pane.set_simple_values(
+                self.config.data.get("enhance_value", 20),
+                self.config.data.get("random_seed", 0),
+            )
 
     def _on_enhance_clicked(self, regions_only: bool = False) -> None:
         self._ensure_initialized()
+        ui = self._active_workflow_ui()
+        if (ui and ui.get_mode() == "simple") or (not ui and self.config.data.get("mode") == "simple"):
+            self._clear_prompts()
         self._cancel_requested = False
         self._set_running(True)
         self._set_status("Starting...")
         config = self._get_config()
         prompts = self._get_prompts()
         parameters = self._get_parameters()
+        if (ui and ui.get_mode() == "simple") or parameters.get("mode") == "simple":
+            defaults = self._default_parameters_payload().get("simple", {})
+            if ui and ui.get_mode() == "simple":
+                ui.set_parameters(defaults)
+                parameters = self._get_parameters()
+            else:
+                parameters["global"] = defaults.get("global", [])
+                parameters["regions"] = defaults.get("regions", [])
+                parameters["params_simple"] = {
+                    "global": list(parameters.get("global", [])),
+                    "regions": list(parameters.get("regions", [])),
+                }
 
         self._log_settings(config, prompts, parameters)
         self._persist_state(prompts, parameters, config)
@@ -198,18 +230,33 @@ class ComfyUIEnhancer:
     def _on_dialog_closed(self) -> None:
         self._persist_state()
 
-    def _default_parameters_payload(self) -> Dict[str, List[Dict[str, str]]]:
+    def _default_parameters_payload(self) -> Dict[str, Dict[str, List[Dict[str, str]]]]:
         return {
-            "global": [dict(p) for p in DEFAULT_GLOBAL_PARAMS],
-            "regions": [dict(p) for p in DEFAULT_REGION_PARAMS],
+            "advanced": {
+                "global": [dict(p) for p in DEFAULT_GLOBAL_PARAMS],
+                "regions": [dict(p) for p in DEFAULT_REGION_PARAMS],
+            },
+            "simple": {
+                "global": [dict(p) for p in DEFAULT_GLOBAL_PARAMS_SIMPLE],
+                "regions": [dict(p) for p in DEFAULT_REGION_PARAMS_SIMPLE],
+            },
         }
 
     def _on_reset_defaults(self) -> None:
         defaults = self._default_parameters_payload()
-        self.config.data["params_global"] = defaults["global"]
-        self.config.data["params_region"] = defaults["regions"]
+        self.config.data["params_global_advanced"] = defaults["advanced"]["global"]
+        self.config.data["params_region_advanced"] = defaults["advanced"]["regions"]
+        self.config.data["params_global_simple"] = defaults["simple"]["global"]
+        self.config.data["params_region_simple"] = defaults["simple"]["regions"]
+        self.config.data["enhance_value"] = 20
+        self.config.data["random_seed"] = 0
         if self.workflow_pane:
-            self.workflow_pane.set_parameters(self._default_parameters_payload())
+            self.workflow_pane.set_all_parameters(
+                params_simple=defaults["simple"],
+                params_advanced=defaults["advanced"],
+                mode=self.config.data.get("mode", "advanced"),
+            )
+            self.workflow_pane.set_simple_values(20, 0)
 
     def _persist_state(
         self,
@@ -230,8 +277,15 @@ class ComfyUIEnhancer:
         self.prompts.save()
 
         self.config.update(config)
-        self.config.data["params_global"] = parameters.get("global", [])
-        self.config.data["params_region"] = parameters.get("regions", [])
+        params_simple = parameters.get("params_simple") or {}
+        params_advanced = parameters.get("params_advanced") or {}
+        self.config.data["params_global_simple"] = params_simple.get("global", [])
+        self.config.data["params_region_simple"] = params_simple.get("regions", [])
+        self.config.data["params_global_advanced"] = params_advanced.get("global", parameters.get("global", []))
+        self.config.data["params_region_advanced"] = params_advanced.get("regions", parameters.get("regions", []))
+        self.config.data["mode"] = parameters.get("mode", self.config.data.get("mode", "advanced"))
+        self.config.data["enhance_value"] = parameters.get("enhance_value", self.config.data.get("enhance_value", 20))
+        self.config.data["random_seed"] = parameters.get("random_seed", self.config.data.get("random_seed", 0))
         if "opacity" in parameters:
             self.config.data["opacity"] = parameters.get("opacity")
         if "fade_ratio" in parameters:
@@ -254,7 +308,35 @@ class ComfyUIEnhancer:
 
     def _get_parameters(self) -> Dict[str, Any]:
         ui = self._active_workflow_ui()
-        params = ui.get_parameters() if ui else {"global": [], "regions": []}
+        if ui:
+            current = ui.get_parameters()
+            all_params = ui.get_all_parameters()
+            simple_values = ui.get_simple_values()
+            params = {
+                "global": current.get("global", []),
+                "regions": current.get("regions", []),
+                "params_simple": all_params.get("simple", {}),
+                "params_advanced": all_params.get("advanced", {}),
+                "mode": ui.get_mode(),
+                "enhance_value": simple_values.get("enhance_value", 20),
+                "random_seed": simple_values.get("random_seed", 0),
+            }
+        else:
+            params = {
+                "global": self.config.data.get("params_global_advanced", []),
+                "regions": self.config.data.get("params_region_advanced", []),
+                "params_simple": {
+                    "global": self.config.data.get("params_global_simple", []),
+                    "regions": self.config.data.get("params_region_simple", []),
+                },
+                "params_advanced": {
+                    "global": self.config.data.get("params_global_advanced", []),
+                    "regions": self.config.data.get("params_region_advanced", []),
+                },
+                "mode": self.config.data.get("mode", "advanced"),
+                "enhance_value": self.config.data.get("enhance_value", 20),
+                "random_seed": self.config.data.get("random_seed", 0),
+            }
         if "opacity" not in params:
             params["opacity"] = self.config.data.get("opacity")
         if "fade_ratio" not in params:
@@ -293,6 +375,25 @@ class ComfyUIEnhancer:
         self.config.load()
         self.parameter_sets.load()
         self._initialized = True
+
+    def _clear_prompts(self) -> None:
+        empty_prompts = {
+            "global": [""],
+            "regions": ["", "", "", ""],
+        }
+        if self.dialog and getattr(self.dialog, "set_prompts", None):
+            try:
+                self.dialog.set_prompts(empty_prompts)
+            except Exception:
+                pass
+        if self.workflow_pane:
+            try:
+                self.workflow_pane.set_prompts(empty_prompts)
+            except Exception:
+                pass
+        self.prompts.set_global("")
+        for idx in range(len(self.prompts.region_prompts)):
+            self.prompts.set_region(idx, "")
 
     def _run_enhance(self, config: Dict[str, Any], prompts: Dict[str, Any], parameters: Dict[str, Any], regions_only: bool = False) -> None:
         doc = self._get_document()
@@ -341,6 +442,11 @@ class ComfyUIEnhancer:
             if "fade_ratio" in parameters:
                 self._log(f"Region edge fade ratio: {parameters.get('fade_ratio')}")
 
+            simple_values = {
+                "enhance_value": parameters.get("enhance_value", 0),
+                "random_seed": parameters.get("random_seed", 0),
+            }
+
             if not regions_only and not global_workflow_path:
                 raise FileNotFoundError("Global workflow not found.")
 
@@ -353,6 +459,7 @@ class ComfyUIEnhancer:
                     image_path=global_img_path,
                     prompt_text=prompts["global"][0],
                     parameters=parameters.get("global", []),
+                    simple_values=simple_values,
                 )
                 prompt_id = self.client.run_workflow(global_payload).get("prompt_id")
                 result = self.client.poll_result(
@@ -404,6 +511,7 @@ class ComfyUIEnhancer:
                     image_path=region_img_path,
                     prompt_text=prompt_text,
                     parameters=parameters.get("regions", []),
+                    simple_values=simple_values,
                 )
                 region_prompt_id = self.client.run_workflow(region_payload).get("prompt_id")
                 region_result = self.client.poll_result(
@@ -497,9 +605,16 @@ class ComfyUIEnhancer:
         self._log(f"Exported region to {temp_path}")
         return temp_path
 
-    def _prepare_workflow(self, workflow_path: str, image_path: str, prompt_text: str, parameters: List[Dict[str, str]]) -> Dict[str, Any]:
+    def _prepare_workflow(
+        self,
+        workflow_path: str,
+        image_path: str,
+        prompt_text: str,
+        parameters: List[Dict[str, str]],
+        simple_values: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         workflow = self.parser.load(workflow_path)
-        context = self._build_value_context(image_path)
+        context = self._build_value_context(image_path, simple_values)
         resolved_prompt = self._fill_placeholders(prompt_text, context)
         resolved_params = self._fill_parameters(parameters, context)
         self._log(f"Value context: width={context.get('width')}, height={context.get('height')}, best-scale={context.get('best-scale')}")
@@ -869,7 +984,7 @@ class ComfyUIEnhancer:
         except Exception:
             pass
 
-    def _build_value_context(self, image_path: str) -> Dict[str, Any]:
+    def _build_value_context(self, image_path: str, simple_values: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         img = QtGui.QImage(image_path)
         width = img.width() if img and not img.isNull() else 0
         height = img.height() if img and not img.isNull() else 0
@@ -880,11 +995,30 @@ class ComfyUIEnhancer:
             best_scale = max(0.2, min(1.0, best_scale))
         if not isfinite(best_scale):
             best_scale = 1.0
-        return {
+        enhance_value = 0.0
+        random_seed = 0
+        if simple_values:
+            try:
+                enhance_value = float(simple_values.get("enhance_value", 0))
+            except (TypeError, ValueError):
+                enhance_value = 0.0
+            try:
+                random_seed = int(simple_values.get("random_seed", 0))
+            except (TypeError, ValueError):
+                random_seed = 0
+        enhance_value = max(0.0, min(100.0, enhance_value))
+        enhance_ratio = enhance_value / 100.0
+        steps = round(5 + (enhance_ratio * 10))
+        context = {
             "width": width,
             "height": height,
             "best-scale": round(best_scale, 4),
+            "seed": random_seed,
+            "steps": int(steps),
+            "classifier-free-guidance": 0,
+            "denoise": enhance_ratio,
         }
+        return context
 
     def _fill_placeholders(self, text: Any, context: Dict[str, Any]) -> Any:
         if not isinstance(text, str):

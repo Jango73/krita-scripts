@@ -37,10 +37,18 @@ class ParameterSetManager:
                 if not isinstance(payload, dict):
                     continue
                 prompts = payload.get("prompts") or {}
-                params = payload.get("params") or {}
+                params_advanced = payload.get("params_advanced") or payload.get("params") or {}
+                params_simple = payload.get("params_simple") or params_advanced or {}
+                mode = payload.get("mode")
+                if mode not in ("simple", "advanced"):
+                    mode = "advanced"
                 normalized[name] = {
+                    "mode": mode,
                     "prompts": self._normalize_prompts(prompts),
-                    "params": self._normalize_params(params),
+                    "params_advanced": self._normalize_params(params_advanced),
+                    "params_simple": self._normalize_params(params_simple),
+                    "enhance_value": self._normalize_int(payload.get("enhance_value"), 20),
+                    "random_seed": self._normalize_int(payload.get("random_seed"), 0),
                 }
             self.sets = normalized
             self._write_log(f"Loaded {len(self.sets)} parameter set(s)")
@@ -66,13 +74,23 @@ class ParameterSetManager:
         """Fetch a set by name."""
         return self.sets.get(name)
 
-    def save_set(self, name: str, prompts: Dict[str, Any], params: Dict[str, Any]) -> None:
+    def save_set(self, name: str, payload: Dict[str, Any]) -> None:
         """Create or overwrite a set."""
         if not name:
             return
+        prompts = payload.get("prompts") or {}
+        params_advanced = payload.get("params_advanced") or payload.get("params") or {}
+        params_simple = payload.get("params_simple") or params_advanced or {}
+        mode = payload.get("mode")
+        if mode not in ("simple", "advanced"):
+            mode = "advanced"
         self.sets[name] = {
+            "mode": mode,
             "prompts": self._normalize_prompts(prompts),
-            "params": self._normalize_params(params),
+            "params_advanced": self._normalize_params(params_advanced),
+            "params_simple": self._normalize_params(params_simple),
+            "enhance_value": self._normalize_int(payload.get("enhance_value"), 20),
+            "random_seed": self._normalize_int(payload.get("random_seed"), 0),
         }
         self.save()
         self._write_log(f"Saved parameter set '{name}'")
@@ -118,6 +136,12 @@ class ParameterSetManager:
             if target:
                 normalized.append({"target": target, "value": value})
         return normalized
+
+    def _normalize_int(self, value: Any, default: int) -> int:
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return default
 
     def _write_log(self, message: str) -> None:
         if self._log:
