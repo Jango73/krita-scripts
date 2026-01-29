@@ -1,8 +1,8 @@
 {
     "id": "09866b64-1e41-4265-b9ab-69acd18e874e",
     "revision": 0,
-    "last_node_id": 111,
-    "last_link_id": 226,
+    "last_node_id": 114,
+    "last_link_id": 234,
     "nodes":
     [
         {
@@ -65,8 +65,8 @@
             "type": "ImpactImageInfo",
             "pos":
             [
-                3940,
-                580
+                940,
+                450
             ],
             "size":
             [
@@ -75,7 +75,7 @@
             ],
             "flags":
             {},
-            "order": 49,
+            "order": 52,
             "mode": 0,
             "inputs":
             [
@@ -131,8 +131,8 @@
             "type": "ImpactCompare",
             "pos":
             [
-                4390,
-                840
+                1190,
+                590
             ],
             "size":
             [
@@ -141,7 +141,7 @@
             ],
             "flags":
             {},
-            "order": 51,
+            "order": 54,
             "mode": 0,
             "inputs":
             [
@@ -194,8 +194,8 @@
             "type": "ImageUpscaleWithModel",
             "pos":
             [
-                4670,
-                840
+                1470,
+                590
             ],
             "size":
             [
@@ -204,7 +204,7 @@
             ],
             "flags":
             {},
-            "order": 50,
+            "order": 53,
             "mode": 0,
             "inputs":
             [
@@ -247,8 +247,8 @@
             "type": "ImpactLogicalOperators",
             "pos":
             [
-                4670,
-                720
+                1470,
+                470
             ],
             "size":
             [
@@ -257,7 +257,7 @@
             ],
             "flags":
             {},
-            "order": 53,
+            "order": 56,
             "mode": 0,
             "inputs":
             [
@@ -310,8 +310,8 @@
             "type": "ImpactConditionalBranch",
             "pos":
             [
-                4950,
-                720
+                1750,
+                470
             ],
             "size":
             [
@@ -320,7 +320,7 @@
             ],
             "flags":
             {},
-            "order": 54,
+            "order": 57,
             "mode": 0,
             "inputs":
             [
@@ -376,8 +376,8 @@
             "type": "ImageScale",
             "pos":
             [
-                5170,
-                720
+                1970,
+                470
             ],
             "size":
             [
@@ -386,7 +386,7 @@
             ],
             "flags":
             {},
-            "order": 55,
+            "order": 58,
             "mode": 0,
             "inputs":
             [
@@ -464,137 +464,6 @@
             ]
         },
         {
-            "id": 80,
-            "type": "ImpactImageInfo",
-            "pos":
-            [
-                3940,
-                460
-            ],
-            "size":
-            [
-                144.13333129882812,
-                86
-            ],
-            "flags":
-            {},
-            "order": 22,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "value",
-                    "name": "value",
-                    "type": "IMAGE",
-                    "link": 159
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "batch",
-                    "name": "batch",
-                    "type": "INT",
-                    "links": null
-                },
-                {
-                    "localized_name": "height",
-                    "name": "height",
-                    "type": "INT",
-                    "links":
-                    [
-                        164,
-                        171
-                    ]
-                },
-                {
-                    "localized_name": "width",
-                    "name": "width",
-                    "type": "INT",
-                    "links":
-                    [
-                        165,
-                        168
-                    ]
-                },
-                {
-                    "localized_name": "channel",
-                    "name": "channel",
-                    "type": "INT",
-                    "links": null
-                }
-            ],
-            "properties":
-            {
-                "Node name for S&R": "ImpactImageInfo"
-            },
-            "widgets_values":
-            []
-        },
-        {
-            "id": 85,
-            "type": "ImpactCompare",
-            "pos":
-            [
-                4390,
-                720
-            ],
-            "size":
-            [
-                270,
-                80
-            ],
-            "flags":
-            {},
-            "order": 52,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "a",
-                    "name": "a",
-                    "type": "INT",
-                    "link": 168
-                },
-                {
-                    "localized_name": "b",
-                    "name": "b",
-                    "type": "INT",
-                    "link": 170
-                },
-                {
-                    "localized_name": "cmp",
-                    "name": "cmp",
-                    "type": "COMBO",
-                    "widget":
-                    {
-                        "name": "cmp"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "BOOLEAN",
-                    "name": "BOOLEAN",
-                    "type": "BOOLEAN",
-                    "links":
-                    [
-                        173
-                    ]
-                }
-            ],
-            "properties":
-            {
-                "Node name for S&R": "ImpactCompare"
-            },
-            "widgets_values":
-            [
-                "a > b"
-            ]
-        },
-        {
             "id": 44,
             "type": "PrimitiveInt",
             "pos":
@@ -655,113 +524,6 @@
                 512,
                 "fixed"
             ]
-        },
-        {
-            "id": 24,
-            "type": "VAEEncode",
-            "pos":
-            [
-                -110,
-                910
-            ],
-            "size":
-            [
-                140,
-                50
-            ],
-            "flags":
-            {},
-            "order": 31,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "pixels",
-                    "name": "pixels",
-                    "type": "IMAGE",
-                    "link": 51
-                },
-                {
-                    "localized_name": "vae",
-                    "name": "vae",
-                    "type": "VAE",
-                    "link": 52
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "LATENT",
-                    "name": "LATENT",
-                    "type": "LATENT",
-                    "links":
-                    [
-                        192
-                    ]
-                }
-            ],
-            "properties":
-            {
-                "Node name for S&R": "VAEEncode",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43"
-            },
-            "widgets_values":
-            []
-        },
-        {
-            "id": 16,
-            "type": "VAEDecode",
-            "pos":
-            [
-                -580,
-                770
-            ],
-            "size":
-            [
-                150,
-                50
-            ],
-            "flags":
-            {},
-            "order": 29,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "samples",
-                    "name": "samples",
-                    "type": "LATENT",
-                    "link": 31
-                },
-                {
-                    "localized_name": "vae",
-                    "name": "vae",
-                    "type": "VAE",
-                    "link": 35
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "IMAGE",
-                    "name": "IMAGE",
-                    "type": "IMAGE",
-                    "slot_index": 0,
-                    "links":
-                    [
-                        46
-                    ]
-                }
-            ],
-            "properties":
-            {
-                "Node name for S&R": "VAEDecode",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43"
-            },
-            "widgets_values":
-            []
         },
         {
             "id": 4,
@@ -874,7 +636,7 @@
             ],
             "flags":
             {},
-            "order": 37,
+            "order": 40,
             "mode": 0,
             "inputs":
             [
@@ -911,7 +673,7 @@
             ],
             "flags":
             {},
-            "order": 57,
+            "order": 60,
             "mode": 0,
             "inputs":
             [
@@ -949,8 +711,8 @@
             "type": "VAEDecode",
             "pos":
             [
-                920,
-                1040
+                -1940,
+                1000
             ],
             "size":
             [
@@ -959,7 +721,7 @@
             ],
             "flags":
             {},
-            "order": 34,
+            "order": 37,
             "mode": 0,
             "inputs":
             [
@@ -1003,8 +765,8 @@
             "type": "VAEDecode",
             "pos":
             [
-                420,
-                690
+                -2440,
+                650
             ],
             "size":
             [
@@ -1013,7 +775,7 @@
             ],
             "flags":
             {},
-            "order": 35,
+            "order": 38,
             "mode": 0,
             "inputs":
             [
@@ -1057,8 +819,8 @@
             "type": "VAEDecode",
             "pos":
             [
-                730,
-                930
+                -2130,
+                890
             ],
             "size":
             [
@@ -1067,7 +829,7 @@
             ],
             "flags":
             {},
-            "order": 36,
+            "order": 39,
             "mode": 0,
             "inputs":
             [
@@ -1112,8 +874,8 @@
             "type": "ImageUpscaleWithModel",
             "pos":
             [
-                950,
-                840
+                -1910,
+                800
             ],
             "size":
             [
@@ -1122,7 +884,7 @@
             ],
             "flags":
             {},
-            "order": 38,
+            "order": 41,
             "mode": 0,
             "inputs":
             [
@@ -1165,8 +927,8 @@
             "type": "ImpactConditionalBranch",
             "pos":
             [
-                1200,
-                690
+                -1660,
+                650
             ],
             "size":
             [
@@ -1175,7 +937,7 @@
             ],
             "flags":
             {},
-            "order": 39,
+            "order": 42,
             "mode": 0,
             "inputs":
             [
@@ -1233,8 +995,8 @@
             "type": "ImpactConditionalBranch",
             "pos":
             [
-                1780,
-                690
+                -1080,
+                650
             ],
             "size":
             [
@@ -1243,7 +1005,7 @@
             ],
             "flags":
             {},
-            "order": 41,
+            "order": 44,
             "mode": 0,
             "inputs":
             [
@@ -1300,8 +1062,8 @@
             "type": "VAEEncode",
             "pos":
             [
-                1450,
-                980
+                -1410,
+                940
             ],
             "size":
             [
@@ -1310,7 +1072,7 @@
             ],
             "flags":
             {},
-            "order": 40,
+            "order": 43,
             "mode": 0,
             "inputs":
             [
@@ -1353,8 +1115,8 @@
             "type": "BNK_TiledKSampler",
             "pos":
             [
-                360,
-                980
+                -2500,
+                940
             ],
             "size":
             [
@@ -1363,7 +1125,7 @@
             ],
             "flags":
             {},
-            "order": 33,
+            "order": 36,
             "mode": 0,
             "inputs":
             [
@@ -1520,8 +1282,8 @@
             "type": "VAEDecode",
             "pos":
             [
-                2010,
-                930
+                -850,
+                890
             ],
             "size":
             [
@@ -1530,7 +1292,7 @@
             ],
             "flags":
             {},
-            "order": 43,
+            "order": 46,
             "mode": 0,
             "inputs":
             [
@@ -1574,8 +1336,8 @@
             "type": "ImpactConditionalBranch",
             "pos":
             [
-                2330,
-                660
+                -530,
+                620
             ],
             "size":
             [
@@ -1584,7 +1346,7 @@
             ],
             "flags":
             {},
-            "order": 44,
+            "order": 47,
             "mode": 0,
             "inputs":
             [
@@ -1642,8 +1404,8 @@
             "type": "VAEEncode",
             "pos":
             [
-                2640,
-                610
+                -220,
+                570
             ],
             "size":
             [
@@ -1652,7 +1414,7 @@
             ],
             "flags":
             {},
-            "order": 45,
+            "order": 48,
             "mode": 0,
             "inputs":
             [
@@ -1695,8 +1457,8 @@
             "type": "DZ_Face_Detailer",
             "pos":
             [
-                2920,
-                730
+                60,
+                690
             ],
             "size":
             [
@@ -1705,7 +1467,7 @@
             ],
             "flags":
             {},
-            "order": 46,
+            "order": 49,
             "mode": 0,
             "inputs":
             [
@@ -1984,7 +1746,8 @@
                     "type": "BOOLEAN",
                     "links":
                     [
-                        138
+                        138,
+                        230
                     ]
                 }
             ],
@@ -2001,82 +1764,12 @@
             ]
         },
         {
-            "id": 64,
-            "type": "ImpactConditionalBranch",
-            "pos":
-            [
-                3680,
-                920
-            ],
-            "size":
-            [
-                210,
-                78
-            ],
-            "flags":
-            {},
-            "order": 48,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "tt_value",
-                    "name": "tt_value",
-                    "type": "IMAGE",
-                    "link": 152
-                },
-                {
-                    "localized_name": "ff_value",
-                    "name": "ff_value",
-                    "type": "IMAGE",
-                    "link": 153
-                },
-                {
-                    "localized_name": "cond",
-                    "name": "cond",
-                    "type": "BOOLEAN",
-                    "widget":
-                    {
-                        "name": "cond"
-                    },
-                    "link": 138
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "label": "IMAGE",
-                    "localized_name": "*",
-                    "name": "*",
-                    "type": "IMAGE",
-                    "links":
-                    [
-                        160,
-                        169,
-                        177,
-                        179
-                    ]
-                }
-            ],
-            "title": "Cond-Face",
-            "properties":
-            {
-                "Node name for S&R": "ImpactConditionalBranch",
-                "cnr_id": "comfyui-impact-pack",
-                "ver": "d900939861ded1ca09ba3ba1735d281810afe53d"
-            },
-            "widgets_values":
-            [
-                false
-            ]
-        },
-        {
             "id": 68,
             "type": "VAEDecode",
             "pos":
             [
-                3250,
-                770
+                390,
+                730
             ],
             "size":
             [
@@ -2085,7 +1778,7 @@
             ],
             "flags":
             {},
-            "order": 47,
+            "order": 50,
             "mode": 0,
             "inputs":
             [
@@ -2125,87 +1818,12 @@
             []
         },
         {
-            "id": 21,
-            "type": "EmptyLatentImage",
-            "pos":
-            [
-                -1660,
-                450
-            ],
-            "size":
-            [
-                280,
-                110
-            ],
-            "flags":
-            {},
-            "order": 18,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "width",
-                    "name": "width",
-                    "type": "INT",
-                    "widget":
-                    {
-                        "name": "width"
-                    },
-                    "link": 109
-                },
-                {
-                    "localized_name": "height",
-                    "name": "height",
-                    "type": "INT",
-                    "widget":
-                    {
-                        "name": "height"
-                    },
-                    "link": 110
-                },
-                {
-                    "localized_name": "batch_size",
-                    "name": "batch_size",
-                    "type": "INT",
-                    "widget":
-                    {
-                        "name": "batch_size"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "LATENT",
-                    "name": "LATENT",
-                    "type": "LATENT",
-                    "links":
-                    [
-                        143
-                    ]
-                }
-            ],
-            "properties":
-            {
-                "Node name for S&R": "EmptyLatentImage",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43"
-            },
-            "widgets_values":
-            [
-                512,
-                512,
-                1
-            ]
-        },
-        {
             "id": 95,
             "type": "ImpactConditionalBranch",
             "pos":
             [
-                -1830,
-                1120
+                -4690,
+                1080
             ],
             "size":
             [
@@ -2214,7 +1832,7 @@
             ],
             "flags":
             {},
-            "order": 25,
+            "order": 27,
             "mode": 0,
             "inputs":
             [
@@ -2271,8 +1889,8 @@
             "type": "ImpactConditionalBranch",
             "pos":
             [
-                50,
-                1180
+                -2810,
+                1140
             ],
             "size":
             [
@@ -2281,7 +1899,7 @@
             ],
             "flags":
             {},
-            "order": 32,
+            "order": 35,
             "mode": 0,
             "inputs":
             [
@@ -2295,7 +1913,7 @@
                     "localized_name": "ff_value",
                     "name": "ff_value",
                     "type": "LATENT",
-                    "link": 192
+                    "link": 234
                 },
                 {
                     "localized_name": "cond",
@@ -2340,8 +1958,8 @@
             "type": "ImpactConditionalBranch",
             "pos":
             [
-                -1220,
-                1150
+                -4080,
+                1110
             ],
             "size":
             [
@@ -2350,7 +1968,7 @@
             ],
             "flags":
             {},
-            "order": 27,
+            "order": 29,
             "mode": 0,
             "inputs":
             [
@@ -2408,8 +2026,8 @@
             "type": "VAEEncode",
             "pos":
             [
-                -1540,
-                1140
+                -4400,
+                1100
             ],
             "size":
             [
@@ -2418,7 +2036,7 @@
             ],
             "flags":
             {},
-            "order": 26,
+            "order": 28,
             "mode": 0,
             "inputs":
             [
@@ -2461,8 +2079,8 @@
             "type": "ImpactConditionalBranch",
             "pos":
             [
-                -2180,
-                970
+                -5040,
+                930
             ],
             "size":
             [
@@ -2471,7 +2089,7 @@
             ],
             "flags":
             {},
-            "order": 24,
+            "order": 25,
             "mode": 0,
             "inputs":
             [
@@ -2528,8 +2146,8 @@
             "type": "ImageScale",
             "pos":
             [
-                -2580,
-                920
+                -5440,
+                880
             ],
             "size":
             [
@@ -2613,72 +2231,6 @@
                 384,
                 384,
                 "disabled"
-            ]
-        },
-        {
-            "id": 83,
-            "type": "ImpactConditionalBranch",
-            "pos":
-            [
-                5580,
-                930
-            ],
-            "size":
-            [
-                210,
-                80
-            ],
-            "flags":
-            {},
-            "order": 56,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "tt_value",
-                    "name": "tt_value",
-                    "type": "IMAGE",
-                    "link": 166
-                },
-                {
-                    "localized_name": "ff_value",
-                    "name": "ff_value",
-                    "type": "IMAGE",
-                    "link": 160
-                },
-                {
-                    "localized_name": "cond",
-                    "name": "cond",
-                    "type": "BOOLEAN",
-                    "widget":
-                    {
-                        "name": "cond"
-                    },
-                    "link": 162
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "label": "IMAGE",
-                    "localized_name": "*",
-                    "name": "*",
-                    "type": "IMAGE",
-                    "links":
-                    [
-                        163
-                    ]
-                }
-            ],
-            "properties":
-            {
-                "Node name for S&R": "ImpactConditionalBranch",
-                "cnr_id": "comfyui-impact-pack",
-                "ver": "d900939861ded1ca09ba3ba1735d281810afe53d"
-            },
-            "widgets_values":
-            [
-                false
             ]
         },
         {
@@ -2800,65 +2352,12 @@
             ]
         },
         {
-            "id": 15,
-            "type": "ImageUpscaleWithModel",
-            "pos":
-            [
-                -370,
-                900
-            ],
-            "size":
-            [
-                221.98202514648438,
-                50
-            ],
-            "flags":
-            {},
-            "order": 30,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "upscale_model",
-                    "name": "upscale_model",
-                    "type": "UPSCALE_MODEL",
-                    "link": 30
-                },
-                {
-                    "localized_name": "image",
-                    "name": "image",
-                    "type": "IMAGE",
-                    "link": 46
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "IMAGE",
-                    "name": "IMAGE",
-                    "type": "IMAGE",
-                    "links":
-                    [
-                        51
-                    ]
-                }
-            ],
-            "properties":
-            {
-                "Node name for S&R": "ImageUpscaleWithModel",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43"
-            },
-            "widgets_values":
-            []
-        },
-        {
             "id": 96,
             "type": "ImageScaleBy",
             "pos":
             [
-                -2230,
-                1110
+                -5090,
+                1070
             ],
             "size":
             [
@@ -3196,7 +2695,8 @@
                     "type": "BOOLEAN",
                     "links":
                     [
-                        66
+                        66,
+                        227
                     ]
                 }
             ],
@@ -3250,7 +2750,8 @@
                     "type": "BOOLEAN",
                     "links":
                     [
-                        82
+                        82,
+                        228
                     ]
                 }
             ],
@@ -3335,8 +2836,8 @@
             "type": "BNK_TiledKSampler",
             "pos":
             [
-                1690,
-                1070
+                -1170,
+                1030
             ],
             "size":
             [
@@ -3345,7 +2846,7 @@
             ],
             "flags":
             {},
-            "order": 42,
+            "order": 45,
             "mode": 0,
             "inputs":
             [
@@ -3511,7 +3012,7 @@
             ],
             "flags":
             {},
-            "order": 15,
+            "order": 12,
             "mode": 0,
             "inputs":
             [
@@ -3564,7 +3065,7 @@
             ],
             "flags":
             {},
-            "order": 16,
+            "order": 13,
             "mode": 0,
             "inputs":
             [
@@ -3616,7 +3117,7 @@
             ],
             "flags":
             {},
-            "order": 17,
+            "order": 14,
             "mode": 0,
             "inputs":
             [
@@ -3668,7 +3169,7 @@
             ],
             "flags":
             {},
-            "order": 13,
+            "order": 15,
             "mode": 0,
             "inputs":
             [
@@ -3721,7 +3222,7 @@
             ],
             "flags":
             {},
-            "order": 14,
+            "order": 16,
             "mode": 0,
             "inputs":
             [
@@ -3775,7 +3276,7 @@
             ],
             "flags":
             {},
-            "order": 12,
+            "order": 17,
             "mode": 0,
             "inputs":
             [
@@ -3819,8 +3320,8 @@
             "type": "KSampler",
             "pos":
             [
-                -910,
-                740
+                -3760,
+                700
             ],
             "size":
             [
@@ -3829,7 +3330,7 @@
             ],
             "flags":
             {},
-            "order": 28,
+            "order": 30,
             "mode": 0,
             "inputs":
             [
@@ -3927,7 +3428,8 @@
                     "slot_index": 0,
                     "links":
                     [
-                        31
+                        31,
+                        233
                     ]
                 }
             ],
@@ -3946,6 +3448,701 @@
                 "euler_ancestral",
                 "normal",
                 0.30000000000000004
+            ]
+        },
+        {
+            "id": 15,
+            "type": "ImageUpscaleWithModel",
+            "pos":
+            [
+                -3370,
+                830
+            ],
+            "size":
+            [
+                221.98202514648438,
+                50
+            ],
+            "flags":
+            {},
+            "order": 32,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "upscale_model",
+                    "name": "upscale_model",
+                    "type": "UPSCALE_MODEL",
+                    "link": 30
+                },
+                {
+                    "localized_name": "image",
+                    "name": "image",
+                    "type": "IMAGE",
+                    "link": 46
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "IMAGE",
+                    "name": "IMAGE",
+                    "type": "IMAGE",
+                    "links":
+                    [
+                        51
+                    ]
+                }
+            ],
+            "properties":
+            {
+                "Node name for S&R": "ImageUpscaleWithModel",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            []
+        },
+        {
+            "id": 24,
+            "type": "VAEEncode",
+            "pos":
+            [
+                -3340,
+                930
+            ],
+            "size":
+            [
+                140,
+                50
+            ],
+            "flags":
+            {},
+            "order": 33,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "pixels",
+                    "name": "pixels",
+                    "type": "IMAGE",
+                    "link": 51
+                },
+                {
+                    "localized_name": "vae",
+                    "name": "vae",
+                    "type": "VAE",
+                    "link": 52
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "LATENT",
+                    "name": "LATENT",
+                    "type": "LATENT",
+                    "links":
+                    [
+                        232
+                    ]
+                }
+            ],
+            "properties":
+            {
+                "Node name for S&R": "VAEEncode",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            []
+        },
+        {
+            "id": 16,
+            "type": "VAEDecode",
+            "pos":
+            [
+                -3360,
+                720
+            ],
+            "size":
+            [
+                150,
+                50
+            ],
+            "flags":
+            {},
+            "order": 31,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "samples",
+                    "name": "samples",
+                    "type": "LATENT",
+                    "link": 31
+                },
+                {
+                    "localized_name": "vae",
+                    "name": "vae",
+                    "type": "VAE",
+                    "link": 35
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "IMAGE",
+                    "name": "IMAGE",
+                    "type": "IMAGE",
+                    "slot_index": 0,
+                    "links":
+                    [
+                        46
+                    ]
+                }
+            ],
+            "properties":
+            {
+                "Node name for S&R": "VAEDecode",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            []
+        },
+        {
+            "id": 114,
+            "type": "ImpactConditionalBranch",
+            "pos":
+            [
+                -3060,
+                930
+            ],
+            "size":
+            [
+                210,
+                78
+            ],
+            "flags":
+            {},
+            "order": 34,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "tt_value",
+                    "name": "tt_value",
+                    "type": "LATENT",
+                    "link": 232
+                },
+                {
+                    "localized_name": "ff_value",
+                    "name": "ff_value",
+                    "type": "LATENT",
+                    "link": 233
+                },
+                {
+                    "localized_name": "cond",
+                    "name": "cond",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "cond"
+                    },
+                    "link": 231
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "label": "LATENT",
+                    "localized_name": "*",
+                    "name": "*",
+                    "type": "LATENT",
+                    "links":
+                    [
+                        234
+                    ]
+                }
+            ],
+            "title": "Cond-Original-Size",
+            "properties":
+            {
+                "Node name for S&R": "ImpactConditionalBranch",
+                "cnr_id": "comfyui-impact-pack",
+                "ver": "d900939861ded1ca09ba3ba1735d281810afe53d"
+            },
+            "widgets_values":
+            [
+                false
+            ]
+        },
+        {
+            "id": 113,
+            "type": "ImpactLogicalOperators",
+            "pos":
+            [
+                -3080,
+                800
+            ],
+            "size":
+            [
+                270,
+                78
+            ],
+            "flags":
+            {},
+            "order": 26,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "bool_a",
+                    "name": "bool_a",
+                    "type": "BOOLEAN",
+                    "link": 229
+                },
+                {
+                    "localized_name": "bool_b",
+                    "name": "bool_b",
+                    "type": "BOOLEAN",
+                    "link": 230
+                },
+                {
+                    "localized_name": "operator",
+                    "name": "operator",
+                    "type": "COMBO",
+                    "widget":
+                    {
+                        "name": "operator"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "BOOLEAN",
+                    "name": "BOOLEAN",
+                    "type": "BOOLEAN",
+                    "links":
+                    [
+                        231
+                    ]
+                }
+            ],
+            "properties":
+            {
+                "Node name for S&R": "ImpactLogicalOperators"
+            },
+            "widgets_values":
+            [
+                "or"
+            ]
+        },
+        {
+            "id": 112,
+            "type": "ImpactLogicalOperators",
+            "pos":
+            [
+                -3080,
+                660
+            ],
+            "size":
+            [
+                270,
+                78
+            ],
+            "flags":
+            {},
+            "order": 24,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "bool_a",
+                    "name": "bool_a",
+                    "type": "BOOLEAN",
+                    "link": 227
+                },
+                {
+                    "localized_name": "bool_b",
+                    "name": "bool_b",
+                    "type": "BOOLEAN",
+                    "link": 228
+                },
+                {
+                    "localized_name": "operator",
+                    "name": "operator",
+                    "type": "COMBO",
+                    "widget":
+                    {
+                        "name": "operator"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "BOOLEAN",
+                    "name": "BOOLEAN",
+                    "type": "BOOLEAN",
+                    "links":
+                    [
+                        229
+                    ]
+                }
+            ],
+            "properties":
+            {
+                "Node name for S&R": "ImpactLogicalOperators"
+            },
+            "widgets_values":
+            [
+                "or"
+            ]
+        },
+        {
+            "id": 21,
+            "type": "EmptyLatentImage",
+            "pos":
+            [
+                -4520,
+                410
+            ],
+            "size":
+            [
+                280,
+                110
+            ],
+            "flags":
+            {},
+            "order": 18,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "width",
+                    "name": "width",
+                    "type": "INT",
+                    "widget":
+                    {
+                        "name": "width"
+                    },
+                    "link": 109
+                },
+                {
+                    "localized_name": "height",
+                    "name": "height",
+                    "type": "INT",
+                    "widget":
+                    {
+                        "name": "height"
+                    },
+                    "link": 110
+                },
+                {
+                    "localized_name": "batch_size",
+                    "name": "batch_size",
+                    "type": "INT",
+                    "widget":
+                    {
+                        "name": "batch_size"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "LATENT",
+                    "name": "LATENT",
+                    "type": "LATENT",
+                    "links":
+                    [
+                        143
+                    ]
+                }
+            ],
+            "properties":
+            {
+                "Node name for S&R": "EmptyLatentImage",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            [
+                512,
+                512,
+                1
+            ]
+        },
+        {
+            "id": 64,
+            "type": "ImpactConditionalBranch",
+            "pos":
+            [
+                690,
+                710
+            ],
+            "size":
+            [
+                210,
+                78
+            ],
+            "flags":
+            {},
+            "order": 51,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "tt_value",
+                    "name": "tt_value",
+                    "type": "IMAGE",
+                    "link": 152
+                },
+                {
+                    "localized_name": "ff_value",
+                    "name": "ff_value",
+                    "type": "IMAGE",
+                    "link": 153
+                },
+                {
+                    "localized_name": "cond",
+                    "name": "cond",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "cond"
+                    },
+                    "link": 138
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "label": "IMAGE",
+                    "localized_name": "*",
+                    "name": "*",
+                    "type": "IMAGE",
+                    "links":
+                    [
+                        160,
+                        169,
+                        177,
+                        179
+                    ]
+                }
+            ],
+            "title": "Cond-Face",
+            "properties":
+            {
+                "Node name for S&R": "ImpactConditionalBranch",
+                "cnr_id": "comfyui-impact-pack",
+                "ver": "d900939861ded1ca09ba3ba1735d281810afe53d"
+            },
+            "widgets_values":
+            [
+                false
+            ]
+        },
+        {
+            "id": 80,
+            "type": "ImpactImageInfo",
+            "pos":
+            [
+                940,
+                330
+            ],
+            "size":
+            [
+                144.13333129882812,
+                86
+            ],
+            "flags":
+            {},
+            "order": 22,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "value",
+                    "name": "value",
+                    "type": "IMAGE",
+                    "link": 159
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "batch",
+                    "name": "batch",
+                    "type": "INT",
+                    "links": null
+                },
+                {
+                    "localized_name": "height",
+                    "name": "height",
+                    "type": "INT",
+                    "links":
+                    [
+                        164,
+                        171
+                    ]
+                },
+                {
+                    "localized_name": "width",
+                    "name": "width",
+                    "type": "INT",
+                    "links":
+                    [
+                        165,
+                        168
+                    ]
+                },
+                {
+                    "localized_name": "channel",
+                    "name": "channel",
+                    "type": "INT",
+                    "links": null
+                }
+            ],
+            "properties":
+            {
+                "Node name for S&R": "ImpactImageInfo"
+            },
+            "widgets_values":
+            []
+        },
+        {
+            "id": 85,
+            "type": "ImpactCompare",
+            "pos":
+            [
+                1190,
+                470
+            ],
+            "size":
+            [
+                270,
+                80
+            ],
+            "flags":
+            {},
+            "order": 55,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "a",
+                    "name": "a",
+                    "type": "INT",
+                    "link": 168
+                },
+                {
+                    "localized_name": "b",
+                    "name": "b",
+                    "type": "INT",
+                    "link": 170
+                },
+                {
+                    "localized_name": "cmp",
+                    "name": "cmp",
+                    "type": "COMBO",
+                    "widget":
+                    {
+                        "name": "cmp"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "BOOLEAN",
+                    "name": "BOOLEAN",
+                    "type": "BOOLEAN",
+                    "links":
+                    [
+                        173
+                    ]
+                }
+            ],
+            "properties":
+            {
+                "Node name for S&R": "ImpactCompare"
+            },
+            "widgets_values":
+            [
+                "a > b"
+            ]
+        },
+        {
+            "id": 83,
+            "type": "ImpactConditionalBranch",
+            "pos":
+            [
+                2320,
+                610
+            ],
+            "size":
+            [
+                210,
+                80
+            ],
+            "flags":
+            {},
+            "order": 59,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "tt_value",
+                    "name": "tt_value",
+                    "type": "IMAGE",
+                    "link": 166
+                },
+                {
+                    "localized_name": "ff_value",
+                    "name": "ff_value",
+                    "type": "IMAGE",
+                    "link": 160
+                },
+                {
+                    "localized_name": "cond",
+                    "name": "cond",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "cond"
+                    },
+                    "link": 162
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "label": "IMAGE",
+                    "localized_name": "*",
+                    "name": "*",
+                    "type": "IMAGE",
+                    "links":
+                    [
+                        163
+                    ]
+                }
+            ],
+            "properties":
+            {
+                "Node name for S&R": "ImpactConditionalBranch",
+                "cnr_id": "comfyui-impact-pack",
+                "ver": "d900939861ded1ca09ba3ba1735d281810afe53d"
+            },
+            "widgets_values":
+            [
+                false
             ]
         }
     ],
@@ -4616,14 +4813,6 @@
             "BOOLEAN"
         ],
         [
-            192,
-            24,
-            0,
-            97,
-            1,
-            "LATENT"
-        ],
-        [
             193,
             97,
             0,
@@ -4854,6 +5043,70 @@
             3,
             9,
             "FLOAT"
+        ],
+        [
+            227,
+            30,
+            0,
+            112,
+            0,
+            "BOOLEAN"
+        ],
+        [
+            228,
+            36,
+            0,
+            112,
+            1,
+            "BOOLEAN"
+        ],
+        [
+            229,
+            112,
+            0,
+            113,
+            0,
+            "BOOLEAN"
+        ],
+        [
+            230,
+            63,
+            0,
+            113,
+            1,
+            "BOOLEAN"
+        ],
+        [
+            231,
+            113,
+            0,
+            114,
+            2,
+            "BOOLEAN"
+        ],
+        [
+            232,
+            24,
+            0,
+            114,
+            0,
+            "LATENT"
+        ],
+        [
+            233,
+            3,
+            0,
+            114,
+            1,
+            "LATENT"
+        ],
+        [
+            234,
+            114,
+            0,
+            97,
+            1,
+            "LATENT"
         ]
     ],
     "groups":
@@ -4864,11 +5117,11 @@
     {
         "ds":
         {
-            "scale": 0.5730855330116813,
+            "scale": 0.3558410273836746,
             "offset":
             [
-                2348.4227621260184,
-                83.71536095426379
+                1077.0298867990796,
+                103.04989267420979
             ]
         },
         "frontendVersion": "1.23.4"
