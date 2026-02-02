@@ -21,8 +21,8 @@ DEFAULT_SERVER_URL = "http://127.0.0.1:8188"
 
 DEFAULT_GLOBAL_PARAMS = [
     {"target": "Img2img", "value": "1"},
-    {"target": "Reduce input", "value": "1"},
-    {"target": "Reduce input amount", "value": "0.5"},
+    {"target": "Scale input", "value": "1"},
+    {"target": "Scale input amount", "value": "0.5"},
     {"target": "Keep original size output", "value": "1"},
     {"target": "Refine stage 1", "value": "1"},
     {"target": "Refine stage 2", "value": "0"},
@@ -38,8 +38,8 @@ DEFAULT_GLOBAL_PARAMS = [
 
 DEFAULT_REGION_PARAMS = [
     {"target": "Img2img", "value": "1"},
-    {"target": "Reduce input", "value": "1"},
-    {"target": "Reduce input amount", "value": "{best-scale}"},
+    {"target": "Scale input", "value": "1"},
+    {"target": "Scale input amount", "value": "{best-scale}"},
     {"target": "Keep original size output", "value": "1"},
     {"target": "Refine stage 1", "value": "1"},
     {"target": "Refine stage 2", "value": "0"},
