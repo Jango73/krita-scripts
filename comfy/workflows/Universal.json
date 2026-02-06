@@ -2,7 +2,7 @@
     "id": "09866b64-1e41-4265-b9ab-69acd18e874e",
     "revision": 0,
     "last_node_id": 116,
-    "last_link_id": 236,
+    "last_link_id": 238,
     "nodes":
     [
         {
@@ -856,7 +856,7 @@
                     "links":
                     [
                         84,
-                        203
+                        204
                     ]
                 }
             ],
@@ -909,7 +909,7 @@
                     "type": "IMAGE",
                     "links":
                     [
-                        204
+                        203
                     ]
                 }
             ],
@@ -961,7 +961,7 @@
                     {
                         "name": "cond"
                     },
-                    "link": 202
+                    "link": 237
                 }
             ],
             "outputs":
@@ -1856,7 +1856,7 @@
                     {
                         "name": "cond"
                     },
-                    "link": 194
+                    "link": 238
                 }
             ],
             "outputs":
@@ -2140,7 +2140,7 @@
             ],
             "flags":
             {},
-            "order": 24,
+            "order": 25,
             "mode": 0,
             "inputs":
             [
@@ -2283,7 +2283,7 @@
             ],
             "flags":
             {},
-            "order": 8,
+            "order": 7,
             "mode": 0,
             "inputs":
             [
@@ -2338,7 +2338,7 @@
             ],
             "flags":
             {},
-            "order": 9,
+            "order": 8,
             "mode": 0,
             "inputs":
             [
@@ -2362,7 +2362,8 @@
                     "links":
                     [
                         82,
-                        228
+                        228,
+                        237
                     ]
                 }
             ],
@@ -2623,7 +2624,7 @@
             ],
             "flags":
             {},
-            "order": 10,
+            "order": 9,
             "mode": 0,
             "inputs":
             [
@@ -2676,7 +2677,7 @@
             ],
             "flags":
             {},
-            "order": 11,
+            "order": 10,
             "mode": 0,
             "inputs":
             [
@@ -2728,7 +2729,7 @@
             ],
             "flags":
             {},
-            "order": 12,
+            "order": 11,
             "mode": 0,
             "inputs":
             [
@@ -2780,7 +2781,7 @@
             ],
             "flags":
             {},
-            "order": 13,
+            "order": 12,
             "mode": 0,
             "inputs":
             [
@@ -2833,7 +2834,7 @@
             ],
             "flags":
             {},
-            "order": 14,
+            "order": 13,
             "mode": 0,
             "inputs":
             [
@@ -2887,7 +2888,7 @@
             ],
             "flags":
             {},
-            "order": 15,
+            "order": 14,
             "mode": 0,
             "inputs":
             [
@@ -3366,7 +3367,7 @@
             ],
             "flags":
             {},
-            "order": 25,
+            "order": 24,
             "mode": 0,
             "inputs":
             [
@@ -3841,116 +3842,6 @@
             ]
         },
         {
-            "id": 82,
-            "type": "PrimitiveBoolean",
-            "pos":
-            [
-                -2230,
-                320
-            ],
-            "size":
-            [
-                280,
-                60
-            ],
-            "flags":
-            {},
-            "order": 16,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "value",
-                    "name": "value",
-                    "type": "BOOLEAN",
-                    "widget":
-                    {
-                        "name": "value"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "BOOLEAN",
-                    "name": "BOOLEAN",
-                    "type": "BOOLEAN",
-                    "links":
-                    [
-                        162,
-                        194,
-                        202
-                    ]
-                }
-            ],
-            "title": "Keep original size output",
-            "properties":
-            {
-                "Node name for S&R": "PrimitiveBoolean",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43"
-            },
-            "widgets_values":
-            [
-                false
-            ]
-        },
-        {
-            "id": 115,
-            "type": "PrimitiveBoolean",
-            "pos":
-            [
-                -2230,
-                -280
-            ],
-            "size":
-            [
-                280,
-                60
-            ],
-            "flags":
-            {},
-            "order": 18,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "value",
-                    "name": "value",
-                    "type": "BOOLEAN",
-                    "widget":
-                    {
-                        "name": "value"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "BOOLEAN",
-                    "name": "BOOLEAN",
-                    "type": "BOOLEAN",
-                    "links":
-                    [
-                        236
-                    ]
-                }
-            ],
-            "title": "Keep original size input",
-            "properties":
-            {
-                "Node name for S&R": "PrimitiveBoolean",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43"
-            },
-            "widgets_values":
-            [
-                false
-            ]
-        },
-        {
             "id": 103,
             "type": "ImpactConditionalBranch",
             "pos":
@@ -4107,7 +3998,7 @@
             ],
             "flags":
             {},
-            "order": 17,
+            "order": 15,
             "mode": 0,
             "inputs":
             [
@@ -4161,7 +4052,7 @@
             ],
             "flags":
             {},
-            "order": 7,
+            "order": 16,
             "mode": 0,
             "inputs":
             [
@@ -4196,6 +4087,115 @@
             "widgets_values":
             [
                 0.5
+            ]
+        },
+        {
+            "id": 82,
+            "type": "PrimitiveBoolean",
+            "pos":
+            [
+                -2230,
+                320
+            ],
+            "size":
+            [
+                280,
+                60
+            ],
+            "flags":
+            {},
+            "order": 17,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "value",
+                    "name": "value",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "value"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "BOOLEAN",
+                    "name": "BOOLEAN",
+                    "type": "BOOLEAN",
+                    "links":
+                    [
+                        162
+                    ]
+                }
+            ],
+            "title": "Keep original size output",
+            "properties":
+            {
+                "Node name for S&R": "PrimitiveBoolean",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            [
+                false
+            ]
+        },
+        {
+            "id": 115,
+            "type": "PrimitiveBoolean",
+            "pos":
+            [
+                -2230,
+                -280
+            ],
+            "size":
+            [
+                280,
+                60
+            ],
+            "flags":
+            {},
+            "order": 18,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "value",
+                    "name": "value",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "value"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "BOOLEAN",
+                    "name": "BOOLEAN",
+                    "type": "BOOLEAN",
+                    "links":
+                    [
+                        236,
+                        238
+                    ]
+                }
+            ],
+            "title": "Keep original size input",
+            "properties":
+            {
+                "Node name for S&R": "PrimitiveBoolean",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            [
+                false
             ]
         }
     ],
@@ -4874,14 +4874,6 @@
             "LATENT"
         ],
         [
-            194,
-            82,
-            0,
-            97,
-            2,
-            "BOOLEAN"
-        ],
-        [
             195,
             97,
             0,
@@ -4938,24 +4930,16 @@
             "IMAGE"
         ],
         [
-            202,
-            82,
-            0,
-            100,
-            2,
-            "BOOLEAN"
-        ],
-        [
             203,
-            23,
+            38,
             0,
             100,
             0,
-            "*"
+            "IMAGE"
         ],
         [
             204,
-            38,
+            23,
             0,
             100,
             1,
@@ -5160,6 +5144,22 @@
             103,
             2,
             "BOOLEAN"
+        ],
+        [
+            237,
+            36,
+            0,
+            100,
+            2,
+            "BOOLEAN"
+        ],
+        [
+            238,
+            115,
+            0,
+            97,
+            2,
+            "BOOLEAN"
         ]
     ],
     "groups":
@@ -5170,11 +5170,11 @@
     {
         "ds":
         {
-            "scale": 0.76277684443855,
+            "scale": 0.8390545288824052,
             "offset":
             [
-                3064.8852063274817,
-                552.5133616077021
+                3197.0886879626332,
+                628.8674098783584
             ]
         },
         "frontendVersion": "1.23.4"
