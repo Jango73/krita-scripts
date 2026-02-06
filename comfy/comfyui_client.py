@@ -1,6 +1,6 @@
 """HTTP client for interacting with ComfyUI workflows."""
 
-from typing import Callable, Optional, Dict, Any
+from typing import Callable, Optional, Dict, Any, Tuple
 import time
 import json
 from urllib.parse import urljoin
@@ -84,6 +84,19 @@ class ComfyUIClient:
             time.sleep(self.poll_interval)
 
         raise TimeoutError(f"Timeout while waiting for result {task_id}")
+
+    def poll_once(self, task_id: str) -> Tuple[str, Optional[Dict[str, Any]]]:
+        """Fetch a single status update for a task."""
+        url = urljoin(self.server_url + "/", f"history/{task_id}")
+        try:
+            raw = self._get_json(url)
+            data = self._unwrap_history(raw, task_id)
+        except error.HTTPError as exc:
+            if exc.code == 404:
+                return "pending", None
+            raise
+        status = self._extract_status(data)
+        return status, data
 
     def _unwrap_history(self, payload: Dict[str, Any], task_id: str) -> Dict[str, Any]:
         """Handle history responses that are wrapped with the task_id key."""

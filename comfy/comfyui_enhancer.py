@@ -2,6 +2,7 @@
 
 import os
 import tempfile
+import time
 from dataclasses import dataclass
 from typing import Optional, Callable, Dict, Any, List, Tuple
 
@@ -41,6 +42,27 @@ class RegionRect:
         return self.width, self.height
 
 
+@dataclass
+class _EnhanceJob:
+    config: Dict[str, Any]
+    prompts: Dict[str, Any]
+    parameters: Dict[str, Any]
+    regions_only: bool
+    doc: Any
+    region_rects: List[RegionRect]
+    region_exports: List[Tuple[RegionRect, str]]
+    temp_files: List[str]
+    global_img_path: str
+    global_workflow_path: str
+    region_workflow_path: str
+    simple_values: Dict[str, Any]
+    stage: str
+    current_region_index: int = 0
+    current_prompt_id: str = ""
+    current_deadline: float = 0.0
+    pending_logged: bool = False
+    global_layer: Optional[Any] = None
+
 class ComfyUIEnhancer:
     """Main extension controller hooking into Krita."""
 
@@ -58,6 +80,8 @@ class ComfyUIEnhancer:
         self.dock = None
         self.workflow_pane = None
         self._initialized = False
+        self._active_job: Optional["_EnhanceJob"] = None
+        self._poll_timer: Optional[QtCore.QTimer] = None
 
     def setup(self) -> None:
         """Setup plugin resources and UI hooks."""
@@ -204,12 +228,9 @@ class ComfyUIEnhancer:
             self._set_status("Running (global + regions)")
         try:
             self._run_enhance(config, prompts, parameters, regions_only=regions_only)
-            self._append_log("Enhance completed.")
-            self._set_status("Done")
         except Exception as exc:
             self._append_log(f"Enhance failed: {exc}")
             self._set_status("Failed")
-        finally:
             self._set_running(False)
             self._cancel_requested = False
 
@@ -401,166 +422,273 @@ class ComfyUIEnhancer:
             self.prompts.set_region(idx, "")
 
     def _run_enhance(self, config: Dict[str, Any], prompts: Dict[str, Any], parameters: Dict[str, Any], regions_only: bool = False) -> None:
+        if self._active_job:
+            raise RuntimeError("Enhance already running.")
+        job = self._prepare_job(config, prompts, parameters, regions_only=regions_only)
+        self._active_job = job
+        self._advance_job(job)
+
+    def _prepare_job(
+        self,
+        config: Dict[str, Any],
+        prompts: Dict[str, Any],
+        parameters: Dict[str, Any],
+        regions_only: bool = False,
+    ) -> _EnhanceJob:
         doc = self._get_document()
         if doc is None:
             self._log("No active document.")
             self._set_status("No document")
-            return
+            raise RuntimeError("No active document")
 
         region_rects = self._get_region_rectangles(doc)
         region_rects.sort(key=lambda r: r.x)
 
+        if self._cancel_requested:
+            raise RuntimeError("Cancelled by user")
+
         temp_files: List[str] = []
-        try:
-            if self._cancel_requested:
-                self._set_status("Cancelled")
+        global_img_path = self._export_full_image(doc)
+        temp_files.append(global_img_path)
+
+        # Export regions before any document mutation (global layer insertion) so that
+        # region-only runs and combined runs use identical region inputs and derived
+        # placeholder values such as {best-scale}.
+        region_exports: List[Tuple[RegionRect, str]] = []
+        for rect in region_rects:
+            path = self._export_region_image(doc, rect)
+            temp_files.append(path)
+            region_exports.append((rect, path))
+
+        global_workflow_path = self._resolve_workflow_path(
+            name=config.get("workflow_global", ""),
+            workflows_dir=config.get("workflows_dir") or DEFAULT_WORKFLOW_DIR,
+        )
+        region_workflow_path = self._resolve_workflow_path(
+            name=config.get("workflow_region", ""),
+            workflows_dir=config.get("workflows_dir") or DEFAULT_WORKFLOW_DIR,
+        )
+
+        self._log(f"Global workflow: {global_workflow_path}")
+        self._log(f"Region workflow: {region_workflow_path}")
+        self._log(f"Global prompt used: {prompts['global'][0]}")
+        self._log("Global parameters used:")
+        for param in parameters.get("global", []):
+            self._log(f"  - {param.get('target')} = {param.get('value')}")
+        if "opacity" in parameters:
+            self._log(f"Layer opacity: {parameters.get('opacity')}")
+        if "fade_ratio" in parameters:
+            self._log(f"Region edge fade ratio: {parameters.get('fade_ratio')}")
+
+        simple_values = {
+            "enhance_value": parameters.get("enhance_value", 0),
+            "random_seed": parameters.get("random_seed", 0),
+        }
+
+        if not regions_only and not global_workflow_path:
+            raise FileNotFoundError("Global workflow not found.")
+
+        stage = "region_submit" if regions_only else "global_submit"
+        return _EnhanceJob(
+            config=config,
+            prompts=prompts,
+            parameters=parameters,
+            regions_only=regions_only,
+            doc=doc,
+            region_rects=region_rects,
+            region_exports=region_exports,
+            temp_files=temp_files,
+            global_img_path=global_img_path,
+            global_workflow_path=global_workflow_path,
+            region_workflow_path=region_workflow_path,
+            simple_values=simple_values,
+            stage=stage,
+        )
+
+    def _advance_job(self, job: _EnhanceJob) -> None:
+        if self._cancel_requested:
+            self._finish_job("cancelled")
+            return
+
+        if job.stage == "global_submit":
+            self._set_status("Running global workflow")
+            global_payload = self._prepare_workflow(
+                workflow_path=job.global_workflow_path,
+                image_path=job.global_img_path,
+                prompt_text=job.prompts["global"][0],
+                parameters=job.parameters.get("global", []),
+                simple_values=job.simple_values,
+            )
+            prompt_id = self.client.run_workflow(global_payload).get("prompt_id")
+            job.current_prompt_id = prompt_id
+            job.current_deadline = time.time() + self.client.max_poll_time
+            job.pending_logged = False
+            job.stage = "global_poll"
+            self._ensure_poll_timer()
+            return
+
+        if job.stage == "region_submit":
+            if job.current_region_index >= len(job.region_rects):
+                self._finish_job("done")
                 return
-            global_img_path = self._export_full_image(doc)
-            temp_files.append(global_img_path)
-
-            # Export regions before any document mutation (global layer insertion) so that
-            # region-only runs and combined runs use identical region inputs and derived
-            # placeholder values such as {best-scale}.
-            region_exports: List[Tuple[RegionRect, str]] = []
-            for rect in region_rects:
-                path = self._export_region_image(doc, rect)
-                temp_files.append(path)
-                region_exports.append((rect, path))
-
-            global_workflow_path = self._resolve_workflow_path(
-                name=config.get("workflow_global", ""),
-                workflows_dir=config.get("workflows_dir") or DEFAULT_WORKFLOW_DIR,
-            )
-            region_workflow_path = self._resolve_workflow_path(
-                name=config.get("workflow_region", ""),
-                workflows_dir=config.get("workflows_dir") or DEFAULT_WORKFLOW_DIR,
-            )
-
-            self._log(f"Global workflow: {global_workflow_path}")
-            self._log(f"Region workflow: {region_workflow_path}")
-            self._log(f"Global prompt used: {prompts['global'][0]}")
-            self._log("Global parameters used:")
-            for param in parameters.get("global", []):
+            if not job.region_workflow_path:
+                self._log("No region workflow provided; skipping region enhancements.")
+                self._finish_job("done")
+                return
+            idx = job.current_region_index
+            rect = job.region_rects[idx]
+            prompt_idx = min(idx, 3)
+            prompt_text = job.prompts["regions"][prompt_idx]
+            self._log(f"Region {idx + 1}: using prompt index {prompt_idx + 1} value '{prompt_text}'")
+            self._log("Region parameters used:")
+            for param in job.parameters.get("regions", []):
                 self._log(f"  - {param.get('target')} = {param.get('value')}")
-            if "opacity" in parameters:
-                self._log(f"Layer opacity: {parameters.get('opacity')}")
-            if "fade_ratio" in parameters:
-                self._log(f"Region edge fade ratio: {parameters.get('fade_ratio')}")
+            if idx < len(job.region_exports):
+                region_img_path = job.region_exports[idx][1]
+            else:
+                region_img_path = self._export_region_image(job.doc, rect)
+                job.temp_files.append(region_img_path)
+            if job.global_layer:
+                self._punch_hole_on_layer(job.global_layer, rect, job.parameters.get("fade_ratio", 0.1))
+            self._set_status(f"Running region {idx + 1}")
+            region_payload = self._prepare_workflow(
+                workflow_path=job.region_workflow_path,
+                image_path=region_img_path,
+                prompt_text=prompt_text,
+                parameters=job.parameters.get("regions", []),
+                simple_values=job.simple_values,
+            )
+            prompt_id = self.client.run_workflow(region_payload).get("prompt_id")
+            job.current_prompt_id = prompt_id
+            job.current_deadline = time.time() + self.client.max_poll_time
+            job.pending_logged = False
+            job.stage = "region_poll"
+            self._ensure_poll_timer()
+            return
 
-            simple_values = {
-                "enhance_value": parameters.get("enhance_value", 0),
-                "random_seed": parameters.get("random_seed", 0),
-            }
+    def _on_poll_tick(self) -> None:
+        job = self._active_job
+        if not job:
+            self._stop_poll_timer()
+            return
+        if self._cancel_requested:
+            self._finish_job("cancelled")
+            return
+        try:
+            if job.stage == "global_poll":
+                self._poll_job(job, is_global=True)
+            elif job.stage == "region_poll":
+                self._poll_job(job, is_global=False)
+            else:
+                self._advance_job(job)
+        except Exception as exc:
+            self._finish_job("failed", error=str(exc))
 
-            if not regions_only and not global_workflow_path:
-                raise FileNotFoundError("Global workflow not found.")
-
-            global_layer = None
-            if not regions_only:
-                # Run global workflow
-                self._set_status("Running global workflow")
-                global_payload = self._prepare_workflow(
-                    workflow_path=global_workflow_path,
-                    image_path=global_img_path,
-                    prompt_text=prompts["global"][0],
-                    parameters=parameters.get("global", []),
-                    simple_values=simple_values,
+    def _poll_job(self, job: _EnhanceJob, is_global: bool) -> None:
+        if time.time() > job.current_deadline:
+            raise TimeoutError(f"Timeout while waiting for result {job.current_prompt_id}")
+        status, data = self.client.poll_once(job.current_prompt_id)
+        if status == "pending":
+            if not job.pending_logged:
+                self._log("Result pending, waiting")
+                job.pending_logged = True
+            else:
+                self._log("__PENDING_DOT__")
+            return
+        if status == "error":
+            raise RuntimeError(f"ComfyUI reported an error for {job.current_prompt_id}")
+        if status != "done":
+            return
+        if not data:
+            raise RuntimeError("No result payload received")
+        output_path = self._find_output_image(data)
+        if not output_path:
+            if is_global:
+                raise FileNotFoundError("Global output image not found.")
+            self._log(f"No output for region {job.current_region_index + 1}")
+            job.current_region_index += 1
+            job.stage = "region_submit"
+            self._advance_job(job)
+            return
+        if is_global:
+            job.global_layer = self._insert_layer_from_file(
+                doc=job.doc,
+                image_path=output_path,
+                name="Global enhance",
+                position=(0, 0),
+                opacity=job.parameters.get("opacity", 0.8),
+                apply_fade=False,
+            )
+            if job.global_layer:
+                self._maybe_delete_output_file(
+                    output_path,
+                    job.config.get("output_dir", ""),
+                    job.config.get("delete_output_after_import", False),
                 )
-                prompt_id = self.client.run_workflow(global_payload).get("prompt_id")
-                result = self.client.poll_result(
-                    prompt_id,
-                    stop_requested=lambda: self._cancel_requested,
-                    tick=self._yield_ui,
-                )
-                global_output = self._find_output_image(result)
-                if not global_output:
-                    raise FileNotFoundError("Global output image not found.")
-                global_layer = self._insert_layer_from_file(
-                    doc=doc,
-                    image_path=global_output,
-                    name="Global enhance",
-                    position=(0, 0),
-                    opacity=parameters.get("opacity", 0.8),
-                    apply_fade=False,
-                )
-                if global_layer:
-                    self._maybe_delete_output_file(
-                        global_output,
-                        config.get("output_dir", ""),
-                        config.get("delete_output_after_import", False),
-                    )
+            job.stage = "region_submit"
+            self._advance_job(job)
+            return
 
-            # Region processing
-            for idx, rect in enumerate(region_rects):
-                if self._cancel_requested:
-                    self._log("Enhance cancelled before region processing.")
-                    self._set_status("Cancelled")
-                    break
-                prompt_idx = min(idx, 3)
-                prompt_text = prompts["regions"][prompt_idx]
-                self._log(f"Region {idx + 1}: using prompt index {prompt_idx + 1} value '{prompt_text}'")
-                self._log("Region parameters used:")
-                for param in parameters.get("regions", []):
-                    self._log(f"  - {param.get('target')} = {param.get('value')}")
-                region_img_path = ""
-                if idx < len(region_exports):
-                    region_img_path = region_exports[idx][1]
-                else:
-                    region_img_path = self._export_region_image(doc, rect)
-                    temp_files.append(region_img_path)
+        rect = job.region_rects[job.current_region_index]
+        region_layer = self._insert_layer_from_file(
+            doc=job.doc,
+            image_path=output_path,
+            name=f"Region enhance #{job.current_region_index + 1}",
+            position=rect.pos,
+            opacity=job.parameters.get("opacity", 0.8),
+            apply_fade=True,
+            fade_ratio=job.parameters.get("fade_ratio", 0.1),
+        )
+        if region_layer:
+            self._maybe_delete_output_file(
+                output_path,
+                job.config.get("output_dir", ""),
+                job.config.get("delete_output_after_import", False),
+            )
+        job.current_region_index += 1
+        job.stage = "region_submit"
+        self._advance_job(job)
 
-                if not region_workflow_path:
-                    self._log("No region workflow provided; skipping region enhancements.")
-                    break
+    def _ensure_poll_timer(self) -> None:
+        if self._poll_timer is None:
+            self._poll_timer = QtCore.QTimer()
+            self._poll_timer.timeout.connect(self._on_poll_tick)
+        interval_ms = 250
+        if self.client and self.client.poll_interval:
+            interval_ms = max(200, int(self.client.poll_interval * 1000))
+        self._poll_timer.setInterval(interval_ms)
+        if not self._poll_timer.isActive():
+            self._poll_timer.start()
 
-                if global_layer:
-                    self._punch_hole_on_layer(global_layer, rect, parameters.get("fade_ratio", 0.1))
+    def _stop_poll_timer(self) -> None:
+        if self._poll_timer and self._poll_timer.isActive():
+            self._poll_timer.stop()
 
-                self._set_status(f"Running region {idx + 1}")
-                region_payload = self._prepare_workflow(
-                    workflow_path=region_workflow_path,
-                    image_path=region_img_path,
-                    prompt_text=prompt_text,
-                    parameters=parameters.get("regions", []),
-                    simple_values=simple_values,
-                )
-                region_prompt_id = self.client.run_workflow(region_payload).get("prompt_id")
-                region_result = self.client.poll_result(
-                    region_prompt_id,
-                    stop_requested=lambda: self._cancel_requested,
-                    tick=self._yield_ui,
-                )
-                region_output = self._find_output_image(region_result)
-                if not region_output:
-                    self._log(f"No output for region {idx + 1}")
-                    continue
-
-                region_layer = self._insert_layer_from_file(
-                    doc=doc,
-                    image_path=region_output,
-                    name=f"Region enhance #{idx + 1}",
-                    position=rect.pos,
-                    opacity=parameters.get("opacity", 0.8),
-                    apply_fade=True,
-                    fade_ratio=parameters.get("fade_ratio", 0.1),
-                )
-                if region_layer:
-                    self._maybe_delete_output_file(
-                        region_output,
-                        config.get("output_dir", ""),
-                        config.get("delete_output_after_import", False),
-                    )
-        finally:
-            for path in temp_files:
+    def _finish_job(self, status: str, error: Optional[str] = None) -> None:
+        job = self._active_job
+        self._active_job = None
+        self._stop_poll_timer()
+        if job:
+            for path in job.temp_files:
                 try:
                     if path and os.path.exists(path):
                         os.remove(path)
                 except OSError:
                     self._log(f"Failed to delete temp file {path}")
-        if self._cancel_requested:
+        if status == "cancelled":
+            self._append_log("Enhance cancelled.")
             self._set_status("Cancelled")
+        elif status == "failed":
+            if error:
+                self._append_log(f"Enhance failed: {error}")
+            else:
+                self._append_log("Enhance failed.")
+            self._set_status("Failed")
         else:
+            self._append_log("Enhance completed.")
             self._set_status("Done")
+        self._set_running(False)
+        self._cancel_requested = False
 
     def _create_client(self, server_url: str) -> ComfyUIClient:
         return ComfyUIClient(server_url=server_url, logger=self._log)
