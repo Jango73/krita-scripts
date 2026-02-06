@@ -91,6 +91,7 @@ class ConfigManager:
             "output_dir": DEFAULT_OUTPUT_DIR,
             "workflow_global": "Universal.json",
             "workflow_region": "Universal.json",
+            "delete_output_after_import": False,
             "params_global_advanced": [dict(p) for p in DEFAULT_GLOBAL_PARAMS],
             "params_region_advanced": [dict(p) for p in DEFAULT_REGION_PARAMS],
             "params_global_simple": [dict(p) for p in DEFAULT_GLOBAL_PARAMS_SIMPLE],

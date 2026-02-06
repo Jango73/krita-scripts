@@ -28,4 +28,4 @@ For DZ_Face_Detailer node
 
 ## Things to know
 - During the enhancing process, the Krita UI responds less frequently to user input, this is normal but will be fixed when possible.
-- After some time using the comfy plugin, there will be a large amount of images in your comfyui output folder, so remember to clean the folder from time to time.
+- The plugin can accumulate many images in the ComfyUI output folder; you can clean it manually or enable the setting that permanently deletes output images after they are used by the plugin.

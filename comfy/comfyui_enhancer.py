@@ -134,6 +134,10 @@ class ComfyUIEnhancer:
         self.dialog.output_dir_edit.setText(output_dir)
         self.dialog.global_workflow_edit.setText(self.config.data.get("workflow_global", "Universal.json"))
         self.dialog.region_workflow_edit.setText(self.config.data.get("workflow_region", "Universal.json"))
+        if hasattr(self.dialog, "delete_output_checkbox"):
+            self.dialog.delete_output_checkbox.setChecked(
+                bool(self.config.data.get("delete_output_after_import", False))
+            )
 
     def _populate_parameters(self) -> None:
         defaults = self._default_parameters_payload()
@@ -353,6 +357,7 @@ class ComfyUIEnhancer:
                 "output_dir": self.config.data.get("output_dir") or DEFAULT_OUTPUT_DIR,
                 "workflow_global": self.config.data.get("workflow_global", "Universal.json"),
                 "workflow_region": self.config.data.get("workflow_region", "Universal.json"),
+                "delete_output_after_import": self.config.data.get("delete_output_after_import", False),
             }
         if not config.get("workflows_dir"):
             config["workflows_dir"] = DEFAULT_WORKFLOW_DIR
@@ -478,6 +483,12 @@ class ComfyUIEnhancer:
                     opacity=parameters.get("opacity", 0.8),
                     apply_fade=False,
                 )
+                if global_layer:
+                    self._maybe_delete_output_file(
+                        global_output,
+                        config.get("output_dir", ""),
+                        config.get("delete_output_after_import", False),
+                    )
 
             # Region processing
             for idx, rect in enumerate(region_rects):
@@ -524,7 +535,7 @@ class ComfyUIEnhancer:
                     self._log(f"No output for region {idx + 1}")
                     continue
 
-                self._insert_layer_from_file(
+                region_layer = self._insert_layer_from_file(
                     doc=doc,
                     image_path=region_output,
                     name=f"Region enhance #{idx + 1}",
@@ -533,6 +544,12 @@ class ComfyUIEnhancer:
                     apply_fade=True,
                     fade_ratio=parameters.get("fade_ratio", 0.1),
                 )
+                if region_layer:
+                    self._maybe_delete_output_file(
+                        region_output,
+                        config.get("output_dir", ""),
+                        config.get("delete_output_after_import", False),
+                    )
         finally:
             for path in temp_files:
                 try:
@@ -826,6 +843,28 @@ class ComfyUIEnhancer:
         self._refresh_views(doc)
         return layer
 
+    def _maybe_delete_output_file(self, image_path: str, output_dir: str, enabled: bool) -> None:
+        if not enabled:
+            return
+        if not image_path:
+            return
+        if not output_dir:
+            return
+        try:
+            if not os.path.exists(image_path):
+                return
+            base_dir = os.path.realpath(output_dir)
+            target = os.path.realpath(image_path)
+            if not base_dir:
+                return
+            if os.path.commonpath([target, base_dir]) != base_dir:
+                self._log(f"Skip deleting output outside output dir: {image_path}")
+                return
+            os.remove(target)
+            self._log(f"Deleted output image {image_path}")
+        except OSError as exc:
+            self._log(f"Failed to delete output image {image_path}: {exc}")
+
     def _apply_edge_fade(self, image: QtGui.QImage, fade_ratio: float) -> None:
         width = image.width()
         height = image.height()
@@ -898,6 +937,7 @@ class ComfyUIEnhancer:
         self._log(f"Output dir: {config.get('output_dir') or DEFAULT_OUTPUT_DIR}")
         self._log(f"Workflow global: {config.get('workflow_global')}")
         self._log(f"Workflow region: {config.get('workflow_region')}")
+        self._log(f"Delete output after import: {bool(config.get('delete_output_after_import', False))}")
         self._log(f"Global prompt: {prompts.get('global', [''])[0]}")
         region_prompts = prompts.get("regions", [])
         for idx, p in enumerate(region_prompts):

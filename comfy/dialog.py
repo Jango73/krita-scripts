@@ -146,10 +146,13 @@ class ComfyUIDialog(QtWidgets.QDialog):
         self.fade_spin.setValue(0.1)
         self.fade_spin.setDecimals(3)
 
+        self.delete_output_checkbox = QtWidgets.QCheckBox("Delete output image after import")
+
         layout.addWidget(QtWidgets.QLabel("New layer opacity (0-1)"), 0, 0)
         layout.addWidget(self.opacity_spin, 0, 1)
         layout.addWidget(QtWidgets.QLabel("Edge fade ratio (0-0.5)"), 1, 0)
         layout.addWidget(self.fade_spin, 1, 1)
+        layout.addWidget(self.delete_output_checkbox, 2, 0, 1, 2)
         layout.setColumnStretch(2, 1)
         return group
 
@@ -226,13 +229,14 @@ class ComfyUIDialog(QtWidgets.QDialog):
     def set_prompts(self, prompts: Dict[str, List[str]]) -> None:
         return
 
-    def get_config(self) -> Dict[str, str]:
+    def get_config(self) -> Dict[str, object]:
         return {
             "server_url": self.server_edit.text(),
             "workflows_dir": self.workflow_dir_edit.text(),
             "output_dir": self.output_dir_edit.text(),
             "workflow_global": self.global_workflow_edit.text(),
             "workflow_region": self.region_workflow_edit.text(),
+            "delete_output_after_import": self.delete_output_checkbox.isChecked(),
         }
 
     def append_log(self, message: str) -> None:
@@ -272,4 +276,5 @@ class ComfyUIDialog(QtWidgets.QDialog):
         self.region_workflow_edit.setText("Universal.json")
         self.opacity_spin.setValue(0.8)
         self.fade_spin.setValue(0.1)
+        self.delete_output_checkbox.setChecked(False)
         self.reset_defaults_requested.emit()
