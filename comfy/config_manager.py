@@ -101,6 +101,7 @@ class ConfigManager:
             "mode": "advanced",
             "enhance_value": 20,
             "random_seed": 0,
+            "image_size": "Medium",
         }
 
     def load(self) -> None:
@@ -127,6 +128,7 @@ class ConfigManager:
                         self.data[k] = self._normalize_params(v)
                     else:
                         self.data[k] = v
+            self.data["mode"] = self._normalize_mode(self.data.get("mode", "advanced"))
             self._write_log(
                 f"Loaded config: server={self.data.get('server_url')}, "
                 f"global wf={self.data.get('workflow_global')}, region wf={self.data.get('workflow_region')}, "
@@ -149,6 +151,14 @@ class ConfigManager:
         for key, value in new_values.items():
             if value is not None:
                 self.data[key] = value
+        self.data["mode"] = self._normalize_mode(self.data.get("mode", "advanced"))
+
+    def _normalize_mode(self, mode: Any) -> str:
+        if mode == "simple":
+            return "simple_enhance"
+        if mode in ("simple_enhance", "simple_creation", "advanced"):
+            return mode
+        return "advanced"
 
     def _normalize_params(self, value: Any) -> List[Dict[str, str]]:
         if isinstance(value, str):

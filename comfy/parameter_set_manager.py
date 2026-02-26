@@ -39,9 +39,7 @@ class ParameterSetManager:
                 prompts = payload.get("prompts") or {}
                 params_advanced = payload.get("params_advanced") or payload.get("params") or {}
                 params_simple = payload.get("params_simple") or params_advanced or {}
-                mode = payload.get("mode")
-                if mode not in ("simple", "advanced"):
-                    mode = "advanced"
+                mode = self._normalize_mode(payload.get("mode"))
                 normalized[name] = {
                     "mode": mode,
                     "prompts": self._normalize_prompts(prompts),
@@ -49,6 +47,7 @@ class ParameterSetManager:
                     "params_simple": self._normalize_params(params_simple),
                     "enhance_value": self._normalize_int(payload.get("enhance_value"), 20),
                     "random_seed": self._normalize_int(payload.get("random_seed"), 0),
+                    "image_size": self._normalize_image_size(payload.get("image_size")),
                 }
             self.sets = normalized
             self._write_log(f"Loaded {len(self.sets)} parameter set(s)")
@@ -81,9 +80,7 @@ class ParameterSetManager:
         prompts = payload.get("prompts") or {}
         params_advanced = payload.get("params_advanced") or payload.get("params") or {}
         params_simple = payload.get("params_simple") or params_advanced or {}
-        mode = payload.get("mode")
-        if mode not in ("simple", "advanced"):
-            mode = "advanced"
+        mode = self._normalize_mode(payload.get("mode"))
         self.sets[name] = {
             "mode": mode,
             "prompts": self._normalize_prompts(prompts),
@@ -91,6 +88,7 @@ class ParameterSetManager:
             "params_simple": self._normalize_params(params_simple),
             "enhance_value": self._normalize_int(payload.get("enhance_value"), 20),
             "random_seed": self._normalize_int(payload.get("random_seed"), 0),
+            "image_size": self._normalize_image_size(payload.get("image_size")),
         }
         self.save()
         self._write_log(f"Saved parameter set '{name}'")
@@ -142,6 +140,19 @@ class ParameterSetManager:
             return int(value)
         except (TypeError, ValueError):
             return default
+
+    def _normalize_mode(self, mode: Any) -> str:
+        if mode == "simple":
+            return "simple_enhance"
+        if mode in ("simple_enhance", "simple_creation", "advanced"):
+            return mode
+        return "advanced"
+
+    def _normalize_image_size(self, value: Any) -> str:
+        text = str(value or "Medium")
+        if text in ("Small", "Medium", "Large"):
+            return text
+        return "Medium"
 
     def _write_log(self, message: str) -> None:
         if self._log:

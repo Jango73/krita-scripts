@@ -83,6 +83,14 @@ class ComfyUIEnhancer:
         self._active_job: Optional["_EnhanceJob"] = None
         self._poll_timer: Optional[QtCore.QTimer] = None
 
+    @staticmethod
+    def _normalize_mode(mode: Any) -> str:
+        if mode == "simple":
+            return "simple_enhance"
+        if mode in ("simple_enhance", "simple_creation", "advanced"):
+            return mode
+        return "advanced"
+
     def setup(self) -> None:
         """Setup plugin resources and UI hooks."""
         self._ensure_initialized()
@@ -165,6 +173,8 @@ class ComfyUIEnhancer:
 
     def _populate_parameters(self) -> None:
         defaults = self._default_parameters_payload()
+        mode = self._normalize_mode(self.config.data.get("mode", "advanced"))
+        self.config.data["mode"] = mode
         params_advanced = {
             "global": self.config.data.get("params_global_advanced") or defaults["advanced"]["global"],
             "regions": self.config.data.get("params_region_advanced") or defaults["advanced"]["regions"],
@@ -185,17 +195,19 @@ class ComfyUIEnhancer:
             self.workflow_pane.set_all_parameters(
                 params_simple=params_simple,
                 params_advanced=params_advanced,
-                mode=self.config.data.get("mode", "advanced"),
+                mode=mode,
             )
             self.workflow_pane.set_simple_values(
                 self.config.data.get("enhance_value", 20),
                 self.config.data.get("random_seed", 0),
+                self.config.data.get("image_size", "Medium"),
             )
 
     def _on_enhance_clicked(self, regions_only: bool = False) -> None:
         self._ensure_initialized()
         ui = self._active_workflow_ui()
-        if (ui and ui.get_mode() == "simple") or (not ui and self.config.data.get("mode") == "simple"):
+        config_mode = self._normalize_mode(self.config.data.get("mode", "advanced"))
+        if (ui and ui.get_mode() == "simple_enhance") or (not ui and config_mode == "simple_enhance"):
             self._clear_prompts()
         self._cancel_requested = False
         self._set_running(True)
@@ -203,9 +215,10 @@ class ComfyUIEnhancer:
         config = self._get_config()
         prompts = self._get_prompts()
         parameters = self._get_parameters()
-        if (ui and ui.get_mode() == "simple") or parameters.get("mode") == "simple":
+        parameters_mode = self._normalize_mode(parameters.get("mode", "advanced"))
+        if (ui and ui.get_mode() in ("simple_enhance", "simple_creation")) or parameters_mode in ("simple_enhance", "simple_creation"):
             defaults = self._default_parameters_payload().get("simple", {})
-            if ui and ui.get_mode() == "simple":
+            if ui and ui.get_mode() in ("simple_enhance", "simple_creation"):
                 ui.set_parameters(defaults)
                 parameters = self._get_parameters()
             else:
@@ -215,6 +228,10 @@ class ComfyUIEnhancer:
                     "global": list(parameters.get("global", [])),
                     "regions": list(parameters.get("regions", [])),
                 }
+            parameters_mode = self._normalize_mode(parameters.get("mode", parameters_mode))
+            if parameters_mode == "simple_creation":
+                image_size = parameters.get("image_size", "Medium")
+                self._apply_creation_size_profile(parameters, image_size)
 
         self._log_settings(config, prompts, parameters)
         self._persist_state(prompts, parameters, config)
@@ -275,13 +292,14 @@ class ComfyUIEnhancer:
         self.config.data["params_region_simple"] = defaults["simple"]["regions"]
         self.config.data["enhance_value"] = 20
         self.config.data["random_seed"] = 0
+        self.config.data["image_size"] = "Medium"
         if self.workflow_pane:
             self.workflow_pane.set_all_parameters(
                 params_simple=defaults["simple"],
                 params_advanced=defaults["advanced"],
-                mode=self.config.data.get("mode", "advanced"),
+                mode=self._normalize_mode(self.config.data.get("mode", "advanced")),
             )
-            self.workflow_pane.set_simple_values(20, 0)
+            self.workflow_pane.set_simple_values(20, 0, "Medium")
 
     def _persist_state(
         self,
@@ -308,9 +326,10 @@ class ComfyUIEnhancer:
         self.config.data["params_region_simple"] = params_simple.get("regions", [])
         self.config.data["params_global_advanced"] = params_advanced.get("global", parameters.get("global", []))
         self.config.data["params_region_advanced"] = params_advanced.get("regions", parameters.get("regions", []))
-        self.config.data["mode"] = parameters.get("mode", self.config.data.get("mode", "advanced"))
+        self.config.data["mode"] = self._normalize_mode(parameters.get("mode", self.config.data.get("mode", "advanced")))
         self.config.data["enhance_value"] = parameters.get("enhance_value", self.config.data.get("enhance_value", 20))
         self.config.data["random_seed"] = parameters.get("random_seed", self.config.data.get("random_seed", 0))
+        self.config.data["image_size"] = parameters.get("image_size", self.config.data.get("image_size", "Medium"))
         if "opacity" in parameters:
             self.config.data["opacity"] = parameters.get("opacity")
         if "fade_ratio" in parameters:
@@ -345,6 +364,7 @@ class ComfyUIEnhancer:
                 "mode": ui.get_mode(),
                 "enhance_value": simple_values.get("enhance_value", 20),
                 "random_seed": simple_values.get("random_seed", 0),
+                "image_size": simple_values.get("image_size", "Medium"),
             }
         else:
             params = {
@@ -358,9 +378,10 @@ class ComfyUIEnhancer:
                     "global": self.config.data.get("params_global_advanced", []),
                     "regions": self.config.data.get("params_region_advanced", []),
                 },
-                "mode": self.config.data.get("mode", "advanced"),
+                "mode": self._normalize_mode(self.config.data.get("mode", "advanced")),
                 "enhance_value": self.config.data.get("enhance_value", 20),
                 "random_seed": self.config.data.get("random_seed", 0),
+                "image_size": self.config.data.get("image_size", "Medium"),
             }
         if "opacity" not in params:
             params["opacity"] = self.config.data.get("opacity")
@@ -483,6 +504,7 @@ class ComfyUIEnhancer:
         simple_values = {
             "enhance_value": parameters.get("enhance_value", 0),
             "random_seed": parameters.get("random_seed", 0),
+            "image_size": parameters.get("image_size", "Medium"),
         }
 
         if not regions_only and not global_workflow_path:
@@ -1171,6 +1193,7 @@ class ComfyUIEnhancer:
             best_scale = 1.0
         enhance_value = 0.0
         random_seed = 0
+        image_size = "Medium"
         if simple_values:
             try:
                 enhance_value = float(simple_values.get("enhance_value", 0))
@@ -1180,6 +1203,9 @@ class ComfyUIEnhancer:
                 random_seed = int(simple_values.get("random_seed", 0))
             except (TypeError, ValueError):
                 random_seed = 0
+            maybe_size = str(simple_values.get("image_size", "Medium"))
+            if maybe_size in ("Small", "Medium", "Large"):
+                image_size = maybe_size
         enhance_value = max(0.0, min(100.0, enhance_value))
         enhance_ratio = enhance_value / 100.0
         steps = round(5 + (enhance_ratio * 10))
@@ -1191,8 +1217,72 @@ class ComfyUIEnhancer:
             "steps": int(steps),
             "classifier-free-guidance": 0,
             "denoise": enhance_ratio,
+            "image-size": image_size,
         }
         return context
+
+    def _creation_stage_profile(self, image_size: Any) -> Dict[str, str]:
+        size = str(image_size or "Medium")
+        if size == "Small":
+            return {"Initial stage": "1", "Refine stage 1": "0", "Refine stage 2": "0"}
+        if size == "Large":
+            return {"Initial stage": "1", "Refine stage 1": "1", "Refine stage 2": "1"}
+        return {"Initial stage": "1", "Refine stage 1": "1", "Refine stage 2": "0"}
+
+    def _creation_sampling_profile(self) -> Dict[str, str]:
+        return {
+            "Steps": "8",
+            "CFG": "1.0",
+            "Denoise": "1.0",
+            "Refine steps": "8",
+            "Refine CFG": "1.0",
+            "Refine denoise": "0.3",
+        }
+
+    def _upsert_stage_params(self, params: List[Dict[str, str]], profile: Dict[str, str]) -> List[Dict[str, str]]:
+        updated = [dict(p) for p in (params or [])]
+        existing = {str(item.get("target", "")).strip().lower(): idx for idx, item in enumerate(updated)}
+        for target, value in profile.items():
+            key = target.lower()
+            if key in existing:
+                updated[existing[key]]["value"] = value
+            else:
+                updated.append({"target": target, "value": value})
+        return updated
+
+    def _force_creation_booleans(self, params: List[Dict[str, str]]) -> List[Dict[str, str]]:
+        # In Simple creation, only control booleans are forced to 0.
+        bool_targets = {
+            "img2img",
+            "scale input",
+            "keep original size input",
+            "keep original size output",
+            "face detailer",
+        }
+        updated = [dict(p) for p in (params or [])]
+        for item in updated:
+            target = str(item.get("target", "") or "").strip().lower()
+            if target in bool_targets:
+                item["value"] = "0"
+        return updated
+
+    def _apply_creation_size_profile(self, parameters: Dict[str, Any], image_size: Any) -> None:
+        profile = self._creation_stage_profile(image_size)
+        sampling_profile = self._creation_sampling_profile()
+        bool_global = self._force_creation_booleans(parameters.get("global", []))
+        bool_regions = self._force_creation_booleans(parameters.get("regions", []))
+        parameters["global"] = self._upsert_stage_params(bool_global, profile)
+        parameters["global"] = self._upsert_stage_params(parameters["global"], sampling_profile)
+        parameters["regions"] = self._upsert_stage_params(bool_regions, profile)
+        parameters["regions"] = self._upsert_stage_params(parameters["regions"], sampling_profile)
+        params_simple = parameters.get("params_simple")
+        if isinstance(params_simple, dict):
+            bool_simple_global = self._force_creation_booleans(params_simple.get("global", []))
+            bool_simple_regions = self._force_creation_booleans(params_simple.get("regions", []))
+            params_simple["global"] = self._upsert_stage_params(bool_simple_global, profile)
+            params_simple["global"] = self._upsert_stage_params(params_simple["global"], sampling_profile)
+            params_simple["regions"] = self._upsert_stage_params(bool_simple_regions, profile)
+            params_simple["regions"] = self._upsert_stage_params(params_simple["regions"], sampling_profile)
 
     def _fill_placeholders(self, text: Any, context: Dict[str, Any]) -> Any:
         if not isinstance(text, str):

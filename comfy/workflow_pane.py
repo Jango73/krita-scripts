@@ -30,10 +30,12 @@ class WorkflowPane(QtWidgets.QWidget):
         self.parameter_sets = parameter_sets
         self._mode = "advanced"
         self._params_by_mode = {
-            "simple": {"global": [], "regions": []},
+            "simple_enhance": {"global": [], "regions": []},
+            "simple_creation": {"global": [], "regions": []},
             "advanced": {"global": [], "regions": []},
         }
         self._simple_params_visible = False
+        self._prompt_sync_guard = False
         self._prompt_editor_buttons: List[QtWidgets.QToolButton] = []
         self._build_ui()
         self._init_parameter_sets_ui()
@@ -129,6 +131,7 @@ class WorkflowPane(QtWidgets.QWidget):
         layout = QtWidgets.QGridLayout(group)
 
         self.global_prompt_edit = QtWidgets.QPlainTextEdit()
+        self.global_prompt_edit.textChanged.connect(self._sync_simple_creation_prompt_from_global)
         line_height = self.global_prompt_edit.fontMetrics().lineSpacing()
         self.global_prompt_edit.setFixedHeight(line_height * 2 + 10)
         layout.addWidget(QtWidgets.QLabel("Global prompt"), 0, 0)
@@ -164,13 +167,26 @@ class WorkflowPane(QtWidgets.QWidget):
         group = QtWidgets.QGroupBox("Simple controls")
         layout = QtWidgets.QGridLayout(group)
         self.enhance_slider, enhance_spin = self._build_slider_row(0, 100, 20)
+        self.enhance_spin = enhance_spin
         self.random_seed_slider, seed_spin = self._build_slider_row(0, 10000, 0)
-        layout.addWidget(QtWidgets.QLabel("Enhance"), 0, 0)
+        self.simple_enhance_label = QtWidgets.QLabel("Enhance")
+        layout.addWidget(self.simple_enhance_label, 0, 0)
         layout.addWidget(self.enhance_slider, 0, 1)
-        layout.addWidget(enhance_spin, 0, 2)
-        layout.addWidget(QtWidgets.QLabel("Random Seed"), 1, 0)
-        layout.addWidget(self.random_seed_slider, 1, 1)
-        layout.addWidget(seed_spin, 1, 2)
+        layout.addWidget(self.enhance_spin, 0, 2)
+        self.image_size_label = QtWidgets.QLabel("Image size")
+        self.image_size_combo = QtWidgets.QComboBox()
+        self.image_size_combo.addItems(["Small", "Medium", "Large"])
+        self.image_size_combo.setCurrentText("Medium")
+        layout.addWidget(self.image_size_label, 1, 0)
+        layout.addWidget(self.image_size_combo, 1, 1, 1, 2)
+        self.simple_creation_prompt_label = QtWidgets.QLabel("Prompt")
+        self.simple_creation_prompt_edit = QtWidgets.QLineEdit()
+        self.simple_creation_prompt_edit.textChanged.connect(self._sync_global_prompt_from_simple_creation)
+        layout.addWidget(self.simple_creation_prompt_label, 2, 0)
+        layout.addWidget(self.simple_creation_prompt_edit, 2, 1, 1, 2)
+        layout.addWidget(QtWidgets.QLabel("Random Seed"), 3, 0)
+        layout.addWidget(self.random_seed_slider, 3, 1)
+        layout.addWidget(seed_spin, 3, 2)
         layout.setColumnStretch(1, 1)
         return group
 
@@ -323,6 +339,24 @@ class WorkflowPane(QtWidgets.QWidget):
         table.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         return table
 
+    def _sync_simple_creation_prompt_from_global(self) -> None:
+        if self._prompt_sync_guard:
+            return
+        self._prompt_sync_guard = True
+        try:
+            self.simple_creation_prompt_edit.setText(self.global_prompt_edit.toPlainText())
+        finally:
+            self._prompt_sync_guard = False
+
+    def _sync_global_prompt_from_simple_creation(self, text: str) -> None:
+        if self._prompt_sync_guard:
+            return
+        self._prompt_sync_guard = True
+        try:
+            self.global_prompt_edit.setPlainText(text)
+        finally:
+            self._prompt_sync_guard = False
+
     def _add_param_row(self, table: QtWidgets.QTableWidget) -> None:
         row = table.rowCount()
         table.insertRow(row)
@@ -356,7 +390,7 @@ class WorkflowPane(QtWidgets.QWidget):
         self._fill_table(self.region_params, params)
 
     def _defaults_for_current_mode(self, scope: str) -> List[Dict[str, str]]:
-        if self._mode == "simple":
+        if self._mode in ("simple_enhance", "simple_creation"):
             return [dict(p) for p in (DEFAULT_GLOBAL_PARAMS_SIMPLE if scope == "global" else DEFAULT_REGION_PARAMS_SIMPLE)]
         return [dict(p) for p in (DEFAULT_GLOBAL_PARAMS if scope == "global" else DEFAULT_REGION_PARAMS)]
 
@@ -411,7 +445,9 @@ class WorkflowPane(QtWidgets.QWidget):
         return self._mode
 
     def set_mode(self, mode: str) -> None:
-        if mode not in ("simple", "advanced"):
+        if mode == "simple":
+            mode = "simple_enhance"
+        if mode not in ("simple_enhance", "simple_creation", "advanced"):
             mode = "advanced"
         if self._mode == mode:
             return
@@ -420,15 +456,18 @@ class WorkflowPane(QtWidgets.QWidget):
         self._apply_mode_ui()
         self._load_mode_params(mode)
 
-    def get_simple_values(self) -> Dict[str, int]:
+    def get_simple_values(self) -> Dict[str, object]:
         return {
             "enhance_value": self.enhance_slider.value(),
             "random_seed": self.random_seed_slider.value(),
+            "image_size": self.image_size_combo.currentText(),
         }
 
-    def set_simple_values(self, enhance_value: int, random_seed: int) -> None:
+    def set_simple_values(self, enhance_value: int, random_seed: int, image_size: str = "Medium") -> None:
         self.enhance_slider.setValue(int(enhance_value))
         self.random_seed_slider.setValue(int(random_seed))
+        if image_size in ("Small", "Medium", "Large"):
+            self.image_size_combo.setCurrentText(image_size)
 
     def get_parameters(self) -> Dict[str, List[Dict[str, str]]]:
         self._snapshot_current_params()
@@ -448,10 +487,15 @@ class WorkflowPane(QtWidgets.QWidget):
 
     def get_all_parameters(self) -> Dict[str, Dict[str, List[Dict[str, str]]]]:
         self._snapshot_current_params()
+        active_simple_key = "simple_creation" if self._mode == "simple_creation" else "simple_enhance"
         return {
             "simple": {
-                "global": list(self._params_by_mode.get("simple", {}).get("global", [])),
-                "regions": list(self._params_by_mode.get("simple", {}).get("regions", [])),
+                "global": list(self._params_by_mode.get(active_simple_key, {}).get("global", [])),
+                "regions": list(self._params_by_mode.get(active_simple_key, {}).get("regions", [])),
+            },
+            "simple_creation": {
+                "global": list(self._params_by_mode.get("simple_creation", {}).get("global", [])),
+                "regions": list(self._params_by_mode.get("simple_creation", {}).get("regions", [])),
             },
             "advanced": {
                 "global": list(self._params_by_mode.get("advanced", {}).get("global", [])),
@@ -466,7 +510,11 @@ class WorkflowPane(QtWidgets.QWidget):
         mode: str,
     ) -> None:
         self._params_by_mode = {
-            "simple": {
+            "simple_enhance": {
+                "global": list(params_simple.get("global", [])),
+                "regions": list(params_simple.get("regions", [])),
+            },
+            "simple_creation": {
                 "global": list(params_simple.get("global", [])),
                 "regions": list(params_simple.get("regions", [])),
             },
@@ -475,7 +523,9 @@ class WorkflowPane(QtWidgets.QWidget):
                 "regions": list(params_advanced.get("regions", [])),
             },
         }
-        self._mode = "advanced" if mode not in ("simple", "advanced") else mode
+        if mode == "simple":
+            mode = "simple_enhance"
+        self._mode = "advanced" if mode not in ("simple_enhance", "simple_creation", "advanced") else mode
         self._apply_mode_ui()
         self._load_mode_params(self._mode)
 
@@ -495,14 +545,27 @@ class WorkflowPane(QtWidgets.QWidget):
         self._fill_table(self.region_params, params.get("regions", []))
 
     def _toggle_mode(self) -> None:
-        next_mode = "simple" if self._mode == "advanced" else "advanced"
+        if self._mode == "advanced":
+            next_mode = "simple_enhance"
+        elif self._mode == "simple_enhance":
+            next_mode = "simple_creation"
+        else:
+            next_mode = "advanced"
         self.set_mode(next_mode)
 
     def _apply_mode_ui(self) -> None:
         if not hasattr(self, "prompts_group"):
             return
-        is_simple = self._mode == "simple"
+        is_simple = self._mode in ("simple_enhance", "simple_creation")
+        is_simple_creation = self._mode == "simple_creation"
         self.simple_controls_group.setVisible(is_simple)
+        self.simple_enhance_label.setVisible(not is_simple_creation)
+        self.enhance_slider.setVisible(not is_simple_creation)
+        self.enhance_spin.setVisible(not is_simple_creation)
+        self.image_size_label.setVisible(is_simple_creation)
+        self.image_size_combo.setVisible(is_simple_creation)
+        self.simple_creation_prompt_label.setVisible(is_simple_creation)
+        self.simple_creation_prompt_edit.setVisible(is_simple_creation)
         self.toggle_params_btn.setVisible(is_simple)
         if is_simple:
             self._set_params_visibility(self._simple_params_visible)
@@ -532,7 +595,12 @@ class WorkflowPane(QtWidgets.QWidget):
     def _update_mode_button(self) -> None:
         if not hasattr(self, "mode_toggle_btn"):
             return
-        label = "Simple" if self._mode == "simple" else "Advanced"
+        if self._mode == "simple_enhance":
+            label = "Simple enhance"
+        elif self._mode == "simple_creation":
+            label = "Simple creation"
+        else:
+            label = "Advanced"
         self.mode_toggle_btn.setText(f"Mode: {label}")
 
     def _set_parameters_enabled(self, enabled: bool) -> None:
@@ -665,6 +733,7 @@ class WorkflowPane(QtWidgets.QWidget):
             "params_advanced": all_params.get("advanced", {}),
             "enhance_value": simple_values.get("enhance_value", 20),
             "random_seed": simple_values.get("random_seed", 0),
+            "image_size": simple_values.get("image_size", "Medium"),
         }
         self.parameter_sets.save_set(name, payload)
         self._refresh_parameter_sets_list()
@@ -688,6 +757,7 @@ class WorkflowPane(QtWidgets.QWidget):
         self.set_simple_values(
             data.get("enhance_value", 20),
             data.get("random_seed", 0),
+            data.get("image_size", "Medium"),
         )
         self._write_log(f"Loaded parameter set '{name}'")
 
