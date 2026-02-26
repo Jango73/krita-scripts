@@ -1,8 +1,8 @@
 {
     "id": "09866b64-1e41-4265-b9ab-69acd18e874e",
     "revision": 0,
-    "last_node_id": 116,
-    "last_link_id": 238,
+    "last_node_id": 119,
+    "last_link_id": 244,
     "nodes":
     [
         {
@@ -10,8 +10,8 @@
             "type": "UpscaleModelLoader",
             "pos":
             [
-                -2920,
-                -270
+                -5300,
+                -370
             ],
             "size":
             [
@@ -75,7 +75,7 @@
             ],
             "flags":
             {},
-            "order": 53,
+            "order": 56,
             "mode": 0,
             "inputs":
             [
@@ -141,7 +141,7 @@
             ],
             "flags":
             {},
-            "order": 55,
+            "order": 58,
             "mode": 0,
             "inputs":
             [
@@ -204,7 +204,7 @@
             ],
             "flags":
             {},
-            "order": 54,
+            "order": 57,
             "mode": 0,
             "inputs":
             [
@@ -257,7 +257,7 @@
             ],
             "flags":
             {},
-            "order": 57,
+            "order": 60,
             "mode": 0,
             "inputs":
             [
@@ -320,7 +320,7 @@
             ],
             "flags":
             {},
-            "order": 58,
+            "order": 61,
             "mode": 0,
             "inputs":
             [
@@ -386,7 +386,7 @@
             ],
             "flags":
             {},
-            "order": 59,
+            "order": 62,
             "mode": 0,
             "inputs":
             [
@@ -526,102 +526,6 @@
             ]
         },
         {
-            "id": 4,
-            "type": "CheckpointLoaderSimple",
-            "pos":
-            [
-                -2920,
-                -410
-            ],
-            "size":
-            [
-                280,
-                100
-            ],
-            "flags":
-            {},
-            "order": 2,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "ckpt_name",
-                    "name": "ckpt_name",
-                    "type": "COMBO",
-                    "widget":
-                    {
-                        "name": "ckpt_name"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "MODEL",
-                    "name": "MODEL",
-                    "type": "MODEL",
-                    "slot_index": 0,
-                    "links":
-                    [
-                        1,
-                        53,
-                        96,
-                        147
-                    ]
-                },
-                {
-                    "localized_name": "CLIP",
-                    "name": "CLIP",
-                    "type": "CLIP",
-                    "slot_index": 1,
-                    "links":
-                    [
-                        3,
-                        5
-                    ]
-                },
-                {
-                    "localized_name": "VAE",
-                    "name": "VAE",
-                    "type": "VAE",
-                    "slot_index": 2,
-                    "links":
-                    [
-                        35,
-                        52,
-                        56,
-                        91,
-                        94,
-                        98,
-                        156,
-                        157,
-                        158,
-                        197,
-                        199
-                    ]
-                }
-            ],
-            "properties":
-            {
-                "Node name for S&R": "CheckpointLoaderSimple",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43",
-                "models":
-                [
-                    {
-                        "name": "v1-5-pruned-emaonly-fp16.safetensors",
-                        "url": "https://huggingface.co/Comfy-Org/stable-diffusion-v1-5-archive/resolve/main/v1-5-pruned-emaonly-fp16.safetensors?download=true",
-                        "directory": "checkpoints"
-                    }
-                ]
-            },
-            "widgets_values":
-            [
-                "realisticVisionV60B1_v51HyperVAE.safetensors"
-            ]
-        },
-        {
             "id": 27,
             "type": "PreviewImage",
             "pos":
@@ -636,7 +540,7 @@
             ],
             "flags":
             {},
-            "order": 41,
+            "order": 44,
             "mode": 0,
             "inputs":
             [
@@ -673,7 +577,7 @@
             ],
             "flags":
             {},
-            "order": 61,
+            "order": 64,
             "mode": 0,
             "inputs":
             [
@@ -721,7 +625,7 @@
             ],
             "flags":
             {},
-            "order": 38,
+            "order": 41,
             "mode": 0,
             "inputs":
             [
@@ -775,7 +679,7 @@
             ],
             "flags":
             {},
-            "order": 39,
+            "order": 42,
             "mode": 0,
             "inputs":
             [
@@ -829,7 +733,7 @@
             ],
             "flags":
             {},
-            "order": 40,
+            "order": 43,
             "mode": 0,
             "inputs":
             [
@@ -884,7 +788,7 @@
             ],
             "flags":
             {},
-            "order": 42,
+            "order": 45,
             "mode": 0,
             "inputs":
             [
@@ -937,7 +841,7 @@
             ],
             "flags":
             {},
-            "order": 43,
+            "order": 46,
             "mode": 0,
             "inputs":
             [
@@ -1005,7 +909,7 @@
             ],
             "flags":
             {},
-            "order": 45,
+            "order": 48,
             "mode": 0,
             "inputs":
             [
@@ -1072,7 +976,7 @@
             ],
             "flags":
             {},
-            "order": 44,
+            "order": 47,
             "mode": 0,
             "inputs":
             [
@@ -1125,7 +1029,7 @@
             ],
             "flags":
             {},
-            "order": 37,
+            "order": 40,
             "mode": 0,
             "inputs":
             [
@@ -1292,7 +1196,7 @@
             ],
             "flags":
             {},
-            "order": 47,
+            "order": 50,
             "mode": 0,
             "inputs":
             [
@@ -1346,7 +1250,7 @@
             ],
             "flags":
             {},
-            "order": 48,
+            "order": 51,
             "mode": 0,
             "inputs":
             [
@@ -1414,7 +1318,7 @@
             ],
             "flags":
             {},
-            "order": 49,
+            "order": 52,
             "mode": 0,
             "inputs":
             [
@@ -1467,7 +1371,7 @@
             ],
             "flags":
             {},
-            "order": 50,
+            "order": 53,
             "mode": 0,
             "inputs":
             [
@@ -1636,7 +1540,7 @@
             },
             "widgets_values":
             [
-                392052147906572,
+                892599818369693,
                 "randomize",
                 20,
                 1,
@@ -1665,7 +1569,7 @@
             ],
             "flags":
             {},
-            "order": 3,
+            "order": 2,
             "mode": 0,
             "inputs":
             [
@@ -1723,7 +1627,7 @@
             ],
             "flags":
             {},
-            "order": 4,
+            "order": 3,
             "mode": 0,
             "inputs":
             [
@@ -1778,7 +1682,7 @@
             ],
             "flags":
             {},
-            "order": 51,
+            "order": 54,
             "mode": 0,
             "inputs":
             [
@@ -1832,7 +1736,7 @@
             ],
             "flags":
             {},
-            "order": 36,
+            "order": 39,
             "mode": 0,
             "inputs":
             [
@@ -1856,7 +1760,7 @@
                     {
                         "name": "cond"
                     },
-                    "link": 238
+                    "link": 244
                 }
             ],
             "outputs":
@@ -1901,7 +1805,7 @@
             ],
             "flags":
             {},
-            "order": 30,
+            "order": 32,
             "mode": 0,
             "inputs":
             [
@@ -1938,7 +1842,8 @@
                     "links":
                     [
                         145,
-                        198
+                        198,
+                        241
                     ]
                 }
             ],
@@ -1969,7 +1874,7 @@
             ],
             "flags":
             {},
-            "order": 29,
+            "order": 31,
             "mode": 0,
             "inputs":
             [
@@ -2008,124 +1913,6 @@
             []
         },
         {
-            "id": 65,
-            "type": "PrimitiveBoolean",
-            "pos":
-            [
-                -2230,
-                -380
-            ],
-            "size":
-            [
-                280,
-                60
-            ],
-            "flags":
-            {},
-            "order": 5,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "value",
-                    "name": "value",
-                    "type": "BOOLEAN",
-                    "widget":
-                    {
-                        "name": "value"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "BOOLEAN",
-                    "name": "BOOLEAN",
-                    "type": "BOOLEAN",
-                    "links":
-                    [
-                        142
-                    ]
-                }
-            ],
-            "title": "Img2img",
-            "properties":
-            {
-                "Node name for S&R": "PrimitiveBoolean",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43"
-            },
-            "widgets_values":
-            [
-                false
-            ]
-        },
-        {
-            "id": 6,
-            "type": "CLIPTextEncode",
-            "pos":
-            [
-                -1940,
-                -380
-            ],
-            "size":
-            [
-                500,
-                150
-            ],
-            "flags":
-            {},
-            "order": 20,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "clip",
-                    "name": "clip",
-                    "type": "CLIP",
-                    "link": 3
-                },
-                {
-                    "localized_name": "text",
-                    "name": "text",
-                    "type": "STRING",
-                    "widget":
-                    {
-                        "name": "text"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "CONDITIONING",
-                    "name": "CONDITIONING",
-                    "type": "CONDITIONING",
-                    "slot_index": 0,
-                    "links":
-                    [
-                        21,
-                        54,
-                        95,
-                        148
-                    ]
-                }
-            ],
-            "title": "Prompt",
-            "properties":
-            {
-                "Node name for S&R": "CLIPTextEncode",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43"
-            },
-            "widgets_values":
-            [
-                ""
-            ]
-        },
-        {
             "id": 96,
             "type": "ImageScaleBy",
             "pos":
@@ -2140,7 +1927,7 @@
             ],
             "flags":
             {},
-            "order": 25,
+            "order": 23,
             "mode": 0,
             "inputs":
             [
@@ -2209,7 +1996,7 @@
             ],
             "flags":
             {},
-            "order": 6,
+            "order": 4,
             "mode": 0,
             "inputs":
             [
@@ -2269,117 +2056,6 @@
             ]
         },
         {
-            "id": 30,
-            "type": "PrimitiveBoolean",
-            "pos":
-            [
-                -2230,
-                20
-            ],
-            "size":
-            [
-                280,
-                60
-            ],
-            "flags":
-            {},
-            "order": 7,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "value",
-                    "name": "value",
-                    "type": "BOOLEAN",
-                    "widget":
-                    {
-                        "name": "value"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "BOOLEAN",
-                    "name": "BOOLEAN",
-                    "type": "BOOLEAN",
-                    "links":
-                    [
-                        66,
-                        227
-                    ]
-                }
-            ],
-            "title": "Refine stage 1",
-            "properties":
-            {
-                "Node name for S&R": "PrimitiveBoolean",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43"
-            },
-            "widgets_values":
-            [
-                false
-            ]
-        },
-        {
-            "id": 36,
-            "type": "PrimitiveBoolean",
-            "pos":
-            [
-                -2230,
-                120
-            ],
-            "size":
-            [
-                280,
-                60
-            ],
-            "flags":
-            {},
-            "order": 8,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "value",
-                    "name": "value",
-                    "type": "BOOLEAN",
-                    "widget":
-                    {
-                        "name": "value"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "BOOLEAN",
-                    "name": "BOOLEAN",
-                    "type": "BOOLEAN",
-                    "links":
-                    [
-                        82,
-                        228,
-                        237
-                    ]
-                }
-            ],
-            "title": "Refine stage 2",
-            "properties":
-            {
-                "Node name for S&R": "PrimitiveBoolean",
-                "cnr_id": "comfy-core",
-                "ver": "0.3.43"
-            },
-            "widgets_values":
-            [
-                false
-            ]
-        },
-        {
             "id": 7,
             "type": "CLIPTextEncode",
             "pos":
@@ -2394,7 +2070,7 @@
             ],
             "flags":
             {},
-            "order": 21,
+            "order": 25,
             "mode": 0,
             "inputs":
             [
@@ -2458,7 +2134,7 @@
             ],
             "flags":
             {},
-            "order": 46,
+            "order": 49,
             "mode": 0,
             "inputs":
             [
@@ -2610,59 +2286,6 @@
             ]
         },
         {
-            "id": 109,
-            "type": "PrimitiveInt",
-            "pos":
-            [
-                -1140,
-                -380
-            ],
-            "size":
-            [
-                270,
-                82
-            ],
-            "flags":
-            {},
-            "order": 9,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "value",
-                    "name": "value",
-                    "type": "INT",
-                    "widget":
-                    {
-                        "name": "value"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "INT",
-                    "name": "INT",
-                    "type": "INT",
-                    "links":
-                    [
-                        224
-                    ]
-                }
-            ],
-            "title": "Steps",
-            "properties":
-            {
-                "Node name for S&R": "PrimitiveInt"
-            },
-            "widgets_values":
-            [
-                7,
-                "fixed"
-            ]
-        },
-        {
             "id": 110,
             "type": "PrimitiveFloat",
             "pos":
@@ -2677,7 +2300,7 @@
             ],
             "flags":
             {},
-            "order": 10,
+            "order": 5,
             "mode": 0,
             "inputs":
             [
@@ -2715,58 +2338,6 @@
             ]
         },
         {
-            "id": 111,
-            "type": "PrimitiveFloat",
-            "pos":
-            [
-                -1140,
-                -140
-            ],
-            "size":
-            [
-                270,
-                80
-            ],
-            "flags":
-            {},
-            "order": 11,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "value",
-                    "name": "value",
-                    "type": "FLOAT",
-                    "widget":
-                    {
-                        "name": "value"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "FLOAT",
-                    "name": "FLOAT",
-                    "type": "FLOAT",
-                    "links":
-                    [
-                        226
-                    ]
-                }
-            ],
-            "title": "Denoise",
-            "properties":
-            {
-                "Node name for S&R": "PrimitiveFloat"
-            },
-            "widgets_values":
-            [
-                0.5
-            ]
-        },
-        {
             "id": 106,
             "type": "PrimitiveFloat",
             "pos":
@@ -2781,7 +2352,7 @@
             ],
             "flags":
             {},
-            "order": 12,
+            "order": 6,
             "mode": 0,
             "inputs":
             [
@@ -2834,7 +2405,7 @@
             ],
             "flags":
             {},
-            "order": 13,
+            "order": 7,
             "mode": 0,
             "inputs":
             [
@@ -2874,60 +2445,6 @@
             ]
         },
         {
-            "id": 104,
-            "type": "PrimitiveInt",
-            "pos":
-            [
-                -860,
-                -380
-            ],
-            "size":
-            [
-                270,
-                82
-            ],
-            "flags":
-            {},
-            "order": 14,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "value",
-                    "name": "value",
-                    "type": "INT",
-                    "widget":
-                    {
-                        "name": "value"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "INT",
-                    "name": "INT",
-                    "type": "INT",
-                    "links":
-                    [
-                        218,
-                        219
-                    ]
-                }
-            ],
-            "title": "Refine steps",
-            "properties":
-            {
-                "Node name for S&R": "PrimitiveInt"
-            },
-            "widgets_values":
-            [
-                7,
-                "fixed"
-            ]
-        },
-        {
             "id": 3,
             "type": "KSampler",
             "pos":
@@ -2942,7 +2459,7 @@
             ],
             "flags":
             {},
-            "order": 31,
+            "order": 33,
             "mode": 0,
             "inputs":
             [
@@ -3040,8 +2557,7 @@
                     "slot_index": 0,
                     "links":
                     [
-                        31,
-                        233
+                        240
                     ]
                 }
             ],
@@ -3077,7 +2593,7 @@
             ],
             "flags":
             {},
-            "order": 33,
+            "order": 36,
             "mode": 0,
             "inputs":
             [
@@ -3130,7 +2646,7 @@
             ],
             "flags":
             {},
-            "order": 34,
+            "order": 37,
             "mode": 0,
             "inputs":
             [
@@ -3183,7 +2699,7 @@
             ],
             "flags":
             {},
-            "order": 32,
+            "order": 35,
             "mode": 0,
             "inputs":
             [
@@ -3223,73 +2739,6 @@
             []
         },
         {
-            "id": 114,
-            "type": "ImpactConditionalBranch",
-            "pos":
-            [
-                -3060,
-                930
-            ],
-            "size":
-            [
-                210,
-                78
-            ],
-            "flags":
-            {},
-            "order": 35,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "tt_value",
-                    "name": "tt_value",
-                    "type": "LATENT",
-                    "link": 232
-                },
-                {
-                    "localized_name": "ff_value",
-                    "name": "ff_value",
-                    "type": "LATENT",
-                    "link": 233
-                },
-                {
-                    "localized_name": "cond",
-                    "name": "cond",
-                    "type": "BOOLEAN",
-                    "widget":
-                    {
-                        "name": "cond"
-                    },
-                    "link": 231
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "label": "LATENT",
-                    "localized_name": "*",
-                    "name": "*",
-                    "type": "LATENT",
-                    "links":
-                    [
-                        234
-                    ]
-                }
-            ],
-            "title": "Cond-Original-Size",
-            "properties":
-            {
-                "Node name for S&R": "ImpactConditionalBranch",
-                "cnr_id": "comfyui-impact-pack",
-                "ver": "d900939861ded1ca09ba3ba1735d281810afe53d"
-            },
-            "widgets_values":
-            [
-                false
-            ]
-        },
-        {
             "id": 113,
             "type": "ImpactLogicalOperators",
             "pos":
@@ -3304,7 +2753,7 @@
             ],
             "flags":
             {},
-            "order": 27,
+            "order": 28,
             "mode": 0,
             "inputs":
             [
@@ -3367,7 +2816,7 @@
             ],
             "flags":
             {},
-            "order": 24,
+            "order": 26,
             "mode": 0,
             "inputs":
             [
@@ -3430,7 +2879,7 @@
             ],
             "flags":
             {},
-            "order": 52,
+            "order": 55,
             "mode": 0,
             "inputs":
             [
@@ -3500,7 +2949,7 @@
             ],
             "flags":
             {},
-            "order": 23,
+            "order": 22,
             "mode": 0,
             "inputs":
             [
@@ -3568,7 +3017,7 @@
             ],
             "flags":
             {},
-            "order": 56,
+            "order": 59,
             "mode": 0,
             "inputs":
             [
@@ -3631,7 +3080,7 @@
             ],
             "flags":
             {},
-            "order": 60,
+            "order": 63,
             "mode": 0,
             "inputs":
             [
@@ -3697,7 +3146,7 @@
             ],
             "flags":
             {},
-            "order": 28,
+            "order": 29,
             "mode": 0,
             "inputs":
             [
@@ -3764,7 +3213,7 @@
             ],
             "flags":
             {},
-            "order": 22,
+            "order": 21,
             "mode": 0,
             "inputs":
             [
@@ -3856,7 +3305,7 @@
             ],
             "flags":
             {},
-            "order": 26,
+            "order": 27,
             "mode": 0,
             "inputs":
             [
@@ -3923,7 +3372,7 @@
             ],
             "flags":
             {},
-            "order": 19,
+            "order": 20,
             "mode": 0,
             "inputs":
             [
@@ -3998,7 +3447,7 @@
             ],
             "flags":
             {},
-            "order": 15,
+            "order": 8,
             "mode": 0,
             "inputs":
             [
@@ -4043,7 +3492,7 @@
             "pos":
             [
                 -2230,
-                -80
+                420
             ],
             "size":
             [
@@ -4052,7 +3501,7 @@
             ],
             "flags":
             {},
-            "order": 16,
+            "order": 9,
             "mode": 0,
             "inputs":
             [
@@ -4104,6 +3553,440 @@
             ],
             "flags":
             {},
+            "order": 10,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "value",
+                    "name": "value",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "value"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "BOOLEAN",
+                    "name": "BOOLEAN",
+                    "type": "BOOLEAN",
+                    "links":
+                    [
+                        162,
+                        244
+                    ]
+                }
+            ],
+            "title": "Keep original size output",
+            "properties":
+            {
+                "Node name for S&R": "PrimitiveBoolean",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            [
+                false
+            ]
+        },
+        {
+            "id": 118,
+            "type": "ImpactConditionalBranch",
+            "pos":
+            [
+                -3530,
+                1040
+            ],
+            "size":
+            [
+                210,
+                78
+            ],
+            "flags":
+            {},
+            "order": 34,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "tt_value",
+                    "name": "tt_value",
+                    "type": "LATENT",
+                    "link": 240
+                },
+                {
+                    "localized_name": "ff_value",
+                    "name": "ff_value",
+                    "type": "LATENT",
+                    "link": 241
+                },
+                {
+                    "localized_name": "cond",
+                    "name": "cond",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "cond"
+                    },
+                    "link": 239
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "label": "LATENT",
+                    "localized_name": "*",
+                    "name": "*",
+                    "type": "LATENT",
+                    "links":
+                    [
+                        31,
+                        233
+                    ]
+                }
+            ],
+            "title": "Cond-Initial-Stage",
+            "properties":
+            {
+                "Node name for S&R": "ImpactConditionalBranch",
+                "cnr_id": "comfyui-impact-pack",
+                "ver": "d900939861ded1ca09ba3ba1735d281810afe53d"
+            },
+            "widgets_values":
+            [
+                true
+            ]
+        },
+        {
+            "id": 4,
+            "type": "CheckpointLoaderSimple",
+            "pos":
+            [
+                -5300,
+                -510
+            ],
+            "size":
+            [
+                280,
+                100
+            ],
+            "flags":
+            {},
+            "order": 11,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "ckpt_name",
+                    "name": "ckpt_name",
+                    "type": "COMBO",
+                    "widget":
+                    {
+                        "name": "ckpt_name"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "MODEL",
+                    "name": "MODEL",
+                    "type": "MODEL",
+                    "slot_index": 0,
+                    "links":
+                    [
+                        1,
+                        53,
+                        96,
+                        147
+                    ]
+                },
+                {
+                    "localized_name": "CLIP",
+                    "name": "CLIP",
+                    "type": "CLIP",
+                    "slot_index": 1,
+                    "links":
+                    [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "localized_name": "VAE",
+                    "name": "VAE",
+                    "type": "VAE",
+                    "slot_index": 2,
+                    "links":
+                    [
+                        35,
+                        52,
+                        56,
+                        91,
+                        94,
+                        98,
+                        156,
+                        157,
+                        158,
+                        197,
+                        199
+                    ]
+                }
+            ],
+            "properties":
+            {
+                "Node name for S&R": "CheckpointLoaderSimple",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43",
+                "models":
+                [
+                    {
+                        "name": "v1-5-pruned-emaonly-fp16.safetensors",
+                        "url": "https://huggingface.co/Comfy-Org/stable-diffusion-v1-5-archive/resolve/main/v1-5-pruned-emaonly-fp16.safetensors?download=true",
+                        "directory": "checkpoints"
+                    }
+                ]
+            },
+            "widgets_values":
+            [
+                "realisticVisionV60B1_v51HyperVAE.safetensors"
+            ]
+        },
+        {
+            "id": 109,
+            "type": "PrimitiveInt",
+            "pos":
+            [
+                -1140,
+                -380
+            ],
+            "size":
+            [
+                270,
+                82
+            ],
+            "flags":
+            {},
+            "order": 12,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "value",
+                    "name": "value",
+                    "type": "INT",
+                    "widget":
+                    {
+                        "name": "value"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "INT",
+                    "name": "INT",
+                    "type": "INT",
+                    "links":
+                    [
+                        224
+                    ]
+                }
+            ],
+            "title": "Steps",
+            "properties":
+            {
+                "Node name for S&R": "PrimitiveInt"
+            },
+            "widgets_values":
+            [
+                8,
+                "fixed"
+            ]
+        },
+        {
+            "id": 104,
+            "type": "PrimitiveInt",
+            "pos":
+            [
+                -860,
+                -380
+            ],
+            "size":
+            [
+                270,
+                82
+            ],
+            "flags":
+            {},
+            "order": 13,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "value",
+                    "name": "value",
+                    "type": "INT",
+                    "widget":
+                    {
+                        "name": "value"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "INT",
+                    "name": "INT",
+                    "type": "INT",
+                    "links":
+                    [
+                        218,
+                        219
+                    ]
+                }
+            ],
+            "title": "Refine steps",
+            "properties":
+            {
+                "Node name for S&R": "PrimitiveInt"
+            },
+            "widgets_values":
+            [
+                8,
+                "fixed"
+            ]
+        },
+        {
+            "id": 65,
+            "type": "PrimitiveBoolean",
+            "pos":
+            [
+                -2230,
+                -380
+            ],
+            "size":
+            [
+                280,
+                60
+            ],
+            "flags":
+            {},
+            "order": 15,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "value",
+                    "name": "value",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "value"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "BOOLEAN",
+                    "name": "BOOLEAN",
+                    "type": "BOOLEAN",
+                    "links":
+                    [
+                        142
+                    ]
+                }
+            ],
+            "title": "Img2img",
+            "properties":
+            {
+                "Node name for S&R": "PrimitiveBoolean",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            [
+                false
+            ]
+        },
+        {
+            "id": 115,
+            "type": "PrimitiveBoolean",
+            "pos":
+            [
+                -2230,
+                -280
+            ],
+            "size":
+            [
+                280,
+                60
+            ],
+            "flags":
+            {},
+            "order": 16,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "value",
+                    "name": "value",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "value"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "BOOLEAN",
+                    "name": "BOOLEAN",
+                    "type": "BOOLEAN",
+                    "links":
+                    [
+                        236
+                    ]
+                }
+            ],
+            "title": "Keep original size input",
+            "properties":
+            {
+                "Node name for S&R": "PrimitiveBoolean",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            [
+                false
+            ]
+        },
+        {
+            "id": 30,
+            "type": "PrimitiveBoolean",
+            "pos":
+            [
+                -2230,
+                20
+            ],
+            "size":
+            [
+                280,
+                60
+            ],
+            "flags":
+            {},
             "order": 17,
             "mode": 0,
             "inputs":
@@ -4127,11 +4010,12 @@
                     "type": "BOOLEAN",
                     "links":
                     [
-                        162
+                        66,
+                        227
                     ]
                 }
             ],
-            "title": "Keep original size output",
+            "title": "Refine stage 1",
             "properties":
             {
                 "Node name for S&R": "PrimitiveBoolean",
@@ -4144,12 +4028,12 @@
             ]
         },
         {
-            "id": 115,
+            "id": 36,
             "type": "PrimitiveBoolean",
             "pos":
             [
                 -2230,
-                -280
+                120
             ],
             "size":
             [
@@ -4181,12 +4065,13 @@
                     "type": "BOOLEAN",
                     "links":
                     [
-                        236,
-                        238
+                        82,
+                        228,
+                        237
                     ]
                 }
             ],
-            "title": "Keep original size input",
+            "title": "Refine stage 2",
             "properties":
             {
                 "Node name for S&R": "PrimitiveBoolean",
@@ -4196,6 +4081,308 @@
             "widgets_values":
             [
                 false
+            ]
+        },
+        {
+            "id": 119,
+            "type": "ImpactLogicalOperators",
+            "pos":
+            [
+                -3080,
+                940
+            ],
+            "size":
+            [
+                270,
+                78
+            ],
+            "flags":
+            {},
+            "order": 30,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "bool_a",
+                    "name": "bool_a",
+                    "type": "BOOLEAN",
+                    "link": 231
+                },
+                {
+                    "localized_name": "bool_b",
+                    "name": "bool_b",
+                    "type": "BOOLEAN",
+                    "link": 242
+                },
+                {
+                    "localized_name": "operator",
+                    "name": "operator",
+                    "type": "COMBO",
+                    "widget":
+                    {
+                        "name": "operator"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "BOOLEAN",
+                    "name": "BOOLEAN",
+                    "type": "BOOLEAN",
+                    "links":
+                    [
+                        243
+                    ]
+                }
+            ],
+            "title": "Cond-Initial-Upscale",
+            "properties":
+            {
+                "Node name for S&R": "ImpactLogicalOperators"
+            },
+            "widgets_values":
+            [
+                "and"
+            ]
+        },
+        {
+            "id": 114,
+            "type": "ImpactConditionalBranch",
+            "pos":
+            [
+                -3080,
+                1140
+            ],
+            "size":
+            [
+                210,
+                78
+            ],
+            "flags":
+            {},
+            "order": 38,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "tt_value",
+                    "name": "tt_value",
+                    "type": "LATENT",
+                    "link": 232
+                },
+                {
+                    "localized_name": "ff_value",
+                    "name": "ff_value",
+                    "type": "LATENT",
+                    "link": 233
+                },
+                {
+                    "localized_name": "cond",
+                    "name": "cond",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "cond"
+                    },
+                    "link": 243
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "label": "LATENT",
+                    "localized_name": "*",
+                    "name": "*",
+                    "type": "LATENT",
+                    "links":
+                    [
+                        234
+                    ]
+                }
+            ],
+            "title": "Cond-Original-Size",
+            "properties":
+            {
+                "Node name for S&R": "ImpactConditionalBranch",
+                "cnr_id": "comfyui-impact-pack",
+                "ver": "d900939861ded1ca09ba3ba1735d281810afe53d"
+            },
+            "widgets_values":
+            [
+                false
+            ]
+        },
+        {
+            "id": 6,
+            "type": "CLIPTextEncode",
+            "pos":
+            [
+                -1940,
+                -380
+            ],
+            "size":
+            [
+                500,
+                150
+            ],
+            "flags":
+            {},
+            "order": 24,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "clip",
+                    "name": "clip",
+                    "type": "CLIP",
+                    "link": 3
+                },
+                {
+                    "localized_name": "text",
+                    "name": "text",
+                    "type": "STRING",
+                    "widget":
+                    {
+                        "name": "text"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "CONDITIONING",
+                    "name": "CONDITIONING",
+                    "type": "CONDITIONING",
+                    "slot_index": 0,
+                    "links":
+                    [
+                        21,
+                        54,
+                        95,
+                        148
+                    ]
+                }
+            ],
+            "title": "Prompt",
+            "properties":
+            {
+                "Node name for S&R": "CLIPTextEncode",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            [
+                ""
+            ]
+        },
+        {
+            "id": 117,
+            "type": "PrimitiveBoolean",
+            "pos":
+            [
+                -2230,
+                -80
+            ],
+            "size":
+            [
+                280,
+                60
+            ],
+            "flags":
+            {},
+            "order": 19,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "value",
+                    "name": "value",
+                    "type": "BOOLEAN",
+                    "widget":
+                    {
+                        "name": "value"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "BOOLEAN",
+                    "name": "BOOLEAN",
+                    "type": "BOOLEAN",
+                    "links":
+                    [
+                        239,
+                        242
+                    ]
+                }
+            ],
+            "title": "Initial stage",
+            "properties":
+            {
+                "Node name for S&R": "PrimitiveBoolean",
+                "cnr_id": "comfy-core",
+                "ver": "0.3.43"
+            },
+            "widgets_values":
+            [
+                false
+            ]
+        },
+        {
+            "id": 111,
+            "type": "PrimitiveFloat",
+            "pos":
+            [
+                -1140,
+                -140
+            ],
+            "size":
+            [
+                270,
+                80
+            ],
+            "flags":
+            {},
+            "order": 14,
+            "mode": 0,
+            "inputs":
+            [
+                {
+                    "localized_name": "value",
+                    "name": "value",
+                    "type": "FLOAT",
+                    "widget":
+                    {
+                        "name": "value"
+                    },
+                    "link": null
+                }
+            ],
+            "outputs":
+            [
+                {
+                    "localized_name": "FLOAT",
+                    "name": "FLOAT",
+                    "type": "FLOAT",
+                    "links":
+                    [
+                        226
+                    ]
+                }
+            ],
+            "title": "Denoise",
+            "properties":
+            {
+                "Node name for S&R": "PrimitiveFloat"
+            },
+            "widgets_values":
+            [
+                0.5
             ]
         }
     ],
@@ -4251,7 +4438,7 @@
         ],
         [
             31,
-            3,
+            118,
             0,
             16,
             0,
@@ -5109,8 +5296,8 @@
             231,
             113,
             0,
-            114,
-            2,
+            119,
+            0,
             "BOOLEAN"
         ],
         [
@@ -5123,7 +5310,7 @@
         ],
         [
             233,
-            3,
+            118,
             0,
             114,
             1,
@@ -5154,8 +5341,48 @@
             "BOOLEAN"
         ],
         [
-            238,
-            115,
+            239,
+            117,
+            0,
+            118,
+            2,
+            "BOOLEAN"
+        ],
+        [
+            240,
+            3,
+            0,
+            118,
+            0,
+            "LATENT"
+        ],
+        [
+            241,
+            66,
+            0,
+            118,
+            1,
+            "LATENT"
+        ],
+        [
+            242,
+            117,
+            0,
+            119,
+            1,
+            "BOOLEAN"
+        ],
+        [
+            243,
+            119,
+            0,
+            114,
+            2,
+            "BOOLEAN"
+        ],
+        [
+            244,
+            82,
             0,
             97,
             2,
@@ -5170,11 +5397,11 @@
     {
         "ds":
         {
-            "scale": 0.8390545288824052,
+            "scale": 0.8390545288824054,
             "offset":
             [
-                3197.0886879626332,
-                628.8674098783584
+                2467.643840182326,
+                506.05465510155557
             ]
         },
         "frontendVersion": "1.23.4"
