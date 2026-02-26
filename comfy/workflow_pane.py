@@ -9,6 +9,9 @@ from .config_manager import (
     DEFAULT_GLOBAL_PARAMS_SIMPLE,
     DEFAULT_REGION_PARAMS,
     DEFAULT_REGION_PARAMS_SIMPLE,
+    DEFAULT_DETAIL_VALUE,
+    DETAIL_MIN,
+    DETAIL_MAX,
 )
 
 
@@ -169,6 +172,12 @@ class WorkflowPane(QtWidgets.QWidget):
         self.enhance_slider, enhance_spin = self._build_slider_row(0, 100, 20)
         self.enhance_spin = enhance_spin
         self.random_seed_slider, seed_spin = self._build_slider_row(0, 10000, 0)
+        self.creation_detail_slider, creation_detail_spin = self._build_slider_row(
+            DETAIL_MIN,
+            DETAIL_MAX,
+            DEFAULT_DETAIL_VALUE,
+        )
+        self.creation_detail_spin = creation_detail_spin
         self.simple_enhance_label = QtWidgets.QLabel("Enhance")
         layout.addWidget(self.simple_enhance_label, 0, 0)
         layout.addWidget(self.enhance_slider, 0, 1)
@@ -184,9 +193,13 @@ class WorkflowPane(QtWidgets.QWidget):
         self.simple_creation_prompt_edit.textChanged.connect(self._sync_global_prompt_from_simple_creation)
         layout.addWidget(self.simple_creation_prompt_label, 2, 0)
         layout.addWidget(self.simple_creation_prompt_edit, 2, 1, 1, 2)
-        layout.addWidget(QtWidgets.QLabel("Random Seed"), 3, 0)
-        layout.addWidget(self.random_seed_slider, 3, 1)
-        layout.addWidget(seed_spin, 3, 2)
+        self.simple_creation_detail_label = QtWidgets.QLabel("Detail")
+        layout.addWidget(self.simple_creation_detail_label, 3, 0)
+        layout.addWidget(self.creation_detail_slider, 3, 1)
+        layout.addWidget(self.creation_detail_spin, 3, 2)
+        layout.addWidget(QtWidgets.QLabel("Random Seed"), 4, 0)
+        layout.addWidget(self.random_seed_slider, 4, 1)
+        layout.addWidget(seed_spin, 4, 2)
         layout.setColumnStretch(1, 1)
         return group
 
@@ -459,12 +472,20 @@ class WorkflowPane(QtWidgets.QWidget):
     def get_simple_values(self) -> Dict[str, object]:
         return {
             "enhance_value": self.enhance_slider.value(),
+            "detail_value": self.creation_detail_slider.value(),
             "random_seed": self.random_seed_slider.value(),
             "image_size": self.image_size_combo.currentText(),
         }
 
-    def set_simple_values(self, enhance_value: int, random_seed: int, image_size: str = "Medium") -> None:
+    def set_simple_values(
+        self,
+        enhance_value: int,
+        random_seed: int,
+        image_size: str = "Medium",
+        detail_value: int = DEFAULT_DETAIL_VALUE,
+    ) -> None:
         self.enhance_slider.setValue(int(enhance_value))
+        self.creation_detail_slider.setValue(int(detail_value))
         self.random_seed_slider.setValue(int(random_seed))
         if image_size in ("Small", "Medium", "Large"):
             self.image_size_combo.setCurrentText(image_size)
@@ -566,6 +587,9 @@ class WorkflowPane(QtWidgets.QWidget):
         self.image_size_combo.setVisible(is_simple_creation)
         self.simple_creation_prompt_label.setVisible(is_simple_creation)
         self.simple_creation_prompt_edit.setVisible(is_simple_creation)
+        self.simple_creation_detail_label.setVisible(is_simple_creation)
+        self.creation_detail_slider.setVisible(is_simple_creation)
+        self.creation_detail_spin.setVisible(is_simple_creation)
         self.toggle_params_btn.setVisible(is_simple)
         if is_simple:
             self._set_params_visibility(self._simple_params_visible)
@@ -732,6 +756,7 @@ class WorkflowPane(QtWidgets.QWidget):
             "params_simple": all_params.get("simple", {}),
             "params_advanced": all_params.get("advanced", {}),
             "enhance_value": simple_values.get("enhance_value", 20),
+            "detail_value": simple_values.get("detail_value", DEFAULT_DETAIL_VALUE),
             "random_seed": simple_values.get("random_seed", 0),
             "image_size": simple_values.get("image_size", "Medium"),
         }
@@ -758,6 +783,7 @@ class WorkflowPane(QtWidgets.QWidget):
             data.get("enhance_value", 20),
             data.get("random_seed", 0),
             data.get("image_size", "Medium"),
+            data.get("detail_value", DEFAULT_DETAIL_VALUE),
         )
         self._write_log(f"Loaded parameter set '{name}'")
 

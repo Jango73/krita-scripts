@@ -22,6 +22,9 @@ from .config_manager import (
     DEFAULT_GLOBAL_PARAMS_SIMPLE,
     DEFAULT_REGION_PARAMS_SIMPLE,
     DEFAULT_OUTPUT_DIR,
+    DEFAULT_DETAIL_VALUE,
+    DETAIL_MIN,
+    DETAIL_MAX,
 )
 from .parameter_set_manager import ParameterSetManager
 
@@ -201,6 +204,7 @@ class ComfyUIEnhancer:
                 self.config.data.get("enhance_value", 20),
                 self.config.data.get("random_seed", 0),
                 self.config.data.get("image_size", "Medium"),
+                self.config.data.get("detail_value", DEFAULT_DETAIL_VALUE),
             )
 
     def _on_enhance_clicked(self, regions_only: bool = False) -> None:
@@ -231,7 +235,8 @@ class ComfyUIEnhancer:
             parameters_mode = self._normalize_mode(parameters.get("mode", parameters_mode))
             if parameters_mode == "simple_creation":
                 image_size = parameters.get("image_size", "Medium")
-                self._apply_creation_size_profile(parameters, image_size)
+                detail_value = parameters.get("detail_value", DEFAULT_DETAIL_VALUE)
+                self._apply_creation_size_profile(parameters, image_size, detail_value)
 
         self._log_settings(config, prompts, parameters)
         self._persist_state(prompts, parameters, config)
@@ -291,6 +296,7 @@ class ComfyUIEnhancer:
         self.config.data["params_global_simple"] = defaults["simple"]["global"]
         self.config.data["params_region_simple"] = defaults["simple"]["regions"]
         self.config.data["enhance_value"] = 20
+        self.config.data["detail_value"] = DEFAULT_DETAIL_VALUE
         self.config.data["random_seed"] = 0
         self.config.data["image_size"] = "Medium"
         if self.workflow_pane:
@@ -299,7 +305,7 @@ class ComfyUIEnhancer:
                 params_advanced=defaults["advanced"],
                 mode=self._normalize_mode(self.config.data.get("mode", "advanced")),
             )
-            self.workflow_pane.set_simple_values(20, 0, "Medium")
+            self.workflow_pane.set_simple_values(20, 0, "Medium", DEFAULT_DETAIL_VALUE)
 
     def _persist_state(
         self,
@@ -328,6 +334,10 @@ class ComfyUIEnhancer:
         self.config.data["params_region_advanced"] = params_advanced.get("regions", parameters.get("regions", []))
         self.config.data["mode"] = self._normalize_mode(parameters.get("mode", self.config.data.get("mode", "advanced")))
         self.config.data["enhance_value"] = parameters.get("enhance_value", self.config.data.get("enhance_value", 20))
+        self.config.data["detail_value"] = parameters.get(
+            "detail_value",
+            self.config.data.get("detail_value", DEFAULT_DETAIL_VALUE),
+        )
         self.config.data["random_seed"] = parameters.get("random_seed", self.config.data.get("random_seed", 0))
         self.config.data["image_size"] = parameters.get("image_size", self.config.data.get("image_size", "Medium"))
         if "opacity" in parameters:
@@ -363,6 +373,7 @@ class ComfyUIEnhancer:
                 "params_advanced": all_params.get("advanced", {}),
                 "mode": ui.get_mode(),
                 "enhance_value": simple_values.get("enhance_value", 20),
+                "detail_value": simple_values.get("detail_value", DEFAULT_DETAIL_VALUE),
                 "random_seed": simple_values.get("random_seed", 0),
                 "image_size": simple_values.get("image_size", "Medium"),
             }
@@ -380,6 +391,7 @@ class ComfyUIEnhancer:
                 },
                 "mode": self._normalize_mode(self.config.data.get("mode", "advanced")),
                 "enhance_value": self.config.data.get("enhance_value", 20),
+                "detail_value": self.config.data.get("detail_value", DEFAULT_DETAIL_VALUE),
                 "random_seed": self.config.data.get("random_seed", 0),
                 "image_size": self.config.data.get("image_size", "Medium"),
             }
@@ -503,6 +515,7 @@ class ComfyUIEnhancer:
 
         simple_values = {
             "enhance_value": parameters.get("enhance_value", 0),
+            "detail_value": parameters.get("detail_value", DEFAULT_DETAIL_VALUE),
             "random_seed": parameters.get("random_seed", 0),
             "image_size": parameters.get("image_size", "Medium"),
         }
@@ -1229,13 +1242,18 @@ class ComfyUIEnhancer:
             return {"Initial stage": "1", "Refine stage 1": "1", "Refine stage 2": "1"}
         return {"Initial stage": "1", "Refine stage 1": "1", "Refine stage 2": "0"}
 
-    def _creation_sampling_profile(self) -> Dict[str, str]:
+    def _creation_sampling_profile(self, detail_value: Any) -> Dict[str, str]:
+        try:
+            detail = max(float(DETAIL_MIN), min(float(DETAIL_MAX), float(detail_value)))
+        except (TypeError, ValueError):
+            detail = float(DEFAULT_DETAIL_VALUE)
+        detail_ratio = detail / float(DETAIL_MAX)
+        steps = detail_ratio * 30.0
+        cfg = detail_ratio * 2.0
         return {
-            "Steps": "8",
-            "CFG": "1.0",
+            "Steps": str(int(round(steps))),
+            "CFG": f"{cfg:.1f}",
             "Denoise": "1.0",
-            "Refine steps": "8",
-            "Refine CFG": "1.0",
             "Refine denoise": "0.3",
         }
 
@@ -1266,9 +1284,9 @@ class ComfyUIEnhancer:
                 item["value"] = "0"
         return updated
 
-    def _apply_creation_size_profile(self, parameters: Dict[str, Any], image_size: Any) -> None:
+    def _apply_creation_size_profile(self, parameters: Dict[str, Any], image_size: Any, detail_value: Any) -> None:
         profile = self._creation_stage_profile(image_size)
-        sampling_profile = self._creation_sampling_profile()
+        sampling_profile = self._creation_sampling_profile(detail_value)
         bool_global = self._force_creation_booleans(parameters.get("global", []))
         bool_regions = self._force_creation_booleans(parameters.get("regions", []))
         parameters["global"] = self._upsert_stage_params(bool_global, profile)

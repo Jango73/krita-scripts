@@ -18,6 +18,9 @@ def _default_output_dir() -> str:
 DEFAULT_WORKFLOW_DIR = _default_workflow_dir()
 DEFAULT_OUTPUT_DIR = _default_output_dir()
 DEFAULT_SERVER_URL = "http://127.0.0.1:8188"
+DETAIL_MIN = 0
+DETAIL_MAX = 100
+DEFAULT_DETAIL_VALUE = 25
 
 DEFAULT_GLOBAL_PARAMS = [
     {"target": "Img2img", "value": "1"},
@@ -100,6 +103,7 @@ class ConfigManager:
             "params_region_simple": [dict(p) for p in DEFAULT_REGION_PARAMS_SIMPLE],
             "mode": "advanced",
             "enhance_value": 20,
+            "detail_value": DEFAULT_DETAIL_VALUE,
             "random_seed": 0,
             "image_size": "Medium",
         }

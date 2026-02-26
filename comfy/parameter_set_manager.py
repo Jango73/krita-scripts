@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Any
 
+from .config_manager import DEFAULT_DETAIL_VALUE
+
 
 DEFAULT_PARAMETER_SETS_PATH = Path.home() / ".krita" / "comfy_param_sets.json"
 
@@ -46,6 +48,7 @@ class ParameterSetManager:
                     "params_advanced": self._normalize_params(params_advanced),
                     "params_simple": self._normalize_params(params_simple),
                     "enhance_value": self._normalize_int(payload.get("enhance_value"), 20),
+                    "detail_value": self._normalize_int(payload.get("detail_value"), DEFAULT_DETAIL_VALUE),
                     "random_seed": self._normalize_int(payload.get("random_seed"), 0),
                     "image_size": self._normalize_image_size(payload.get("image_size")),
                 }
@@ -87,6 +90,7 @@ class ParameterSetManager:
             "params_advanced": self._normalize_params(params_advanced),
             "params_simple": self._normalize_params(params_simple),
             "enhance_value": self._normalize_int(payload.get("enhance_value"), 20),
+            "detail_value": self._normalize_int(payload.get("detail_value"), DEFAULT_DETAIL_VALUE),
             "random_seed": self._normalize_int(payload.get("random_seed"), 0),
             "image_size": self._normalize_image_size(payload.get("image_size")),
         }
