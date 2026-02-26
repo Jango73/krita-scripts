@@ -4,6 +4,12 @@ from typing import Callable, Dict, List, Optional, Tuple
 from PyQt5 import QtWidgets, QtCore
 
 from .parameter_set_manager import ParameterSetManager
+from .config_manager import (
+    DEFAULT_GLOBAL_PARAMS,
+    DEFAULT_GLOBAL_PARAMS_SIMPLE,
+    DEFAULT_REGION_PARAMS,
+    DEFAULT_REGION_PARAMS_SIMPLE,
+)
 
 
 class WorkflowPane(QtWidgets.QWidget):
@@ -192,26 +198,32 @@ class WorkflowPane(QtWidgets.QWidget):
         self.add_global_btn = QtWidgets.QPushButton("Add")
         self.remove_global_btn = QtWidgets.QPushButton("Remove")
         self.clear_global_btn = QtWidgets.QPushButton("Clear")
+        self.reset_global_btn = QtWidgets.QPushButton("Reset")
         self.add_global_btn.clicked.connect(lambda: self._add_param_row(self.global_params))
         self.remove_global_btn.clicked.connect(lambda: self._remove_param_row(self.global_params))
         self.clear_global_btn.clicked.connect(lambda: self._confirm_and_clear(self.global_params, "Clear global parameters?"))
+        self.reset_global_btn.clicked.connect(lambda: self._reset_param_table("global"))
         global_btn_row = QtWidgets.QHBoxLayout()
         global_btn_row.addWidget(self.add_global_btn)
         global_btn_row.addWidget(self.remove_global_btn)
         global_btn_row.addWidget(self.clear_global_btn)
+        global_btn_row.addWidget(self.reset_global_btn)
         global_btn_row.addStretch(1)
 
         self.region_params = self._make_param_table()
         self.add_region_btn = QtWidgets.QPushButton("Add")
         self.remove_region_btn = QtWidgets.QPushButton("Remove")
         self.clear_region_btn = QtWidgets.QPushButton("Clear")
+        self.reset_region_btn = QtWidgets.QPushButton("Reset")
         self.add_region_btn.clicked.connect(lambda: self._add_param_row(self.region_params))
         self.remove_region_btn.clicked.connect(lambda: self._remove_param_row(self.region_params))
         self.clear_region_btn.clicked.connect(lambda: self._confirm_and_clear(self.region_params, "Clear region parameters?"))
+        self.reset_region_btn.clicked.connect(lambda: self._reset_param_table("regions"))
         region_btn_row = QtWidgets.QHBoxLayout()
         region_btn_row.addWidget(self.add_region_btn)
         region_btn_row.addWidget(self.remove_region_btn)
         region_btn_row.addWidget(self.clear_region_btn)
+        region_btn_row.addWidget(self.reset_region_btn)
         region_btn_row.addStretch(1)
         self.copy_global_to_region_btn = QtWidgets.QPushButton("Copy global to region")
         self.copy_global_to_region_btn.clicked.connect(self._copy_global_params_to_region)
@@ -342,6 +354,18 @@ class WorkflowPane(QtWidgets.QWidget):
     def _copy_global_params_to_region(self) -> None:
         params = self._read_table(self.global_params)
         self._fill_table(self.region_params, params)
+
+    def _defaults_for_current_mode(self, scope: str) -> List[Dict[str, str]]:
+        if self._mode == "simple":
+            return [dict(p) for p in (DEFAULT_GLOBAL_PARAMS_SIMPLE if scope == "global" else DEFAULT_REGION_PARAMS_SIMPLE)]
+        return [dict(p) for p in (DEFAULT_GLOBAL_PARAMS if scope == "global" else DEFAULT_REGION_PARAMS)]
+
+    def _reset_param_table(self, scope: str) -> None:
+        if scope not in ("global", "regions"):
+            return
+        table = self.global_params if scope == "global" else self.region_params
+        defaults = self._defaults_for_current_mode(scope)
+        self._fill_table(table, defaults)
 
     def _read_table(self, table: QtWidgets.QTableWidget) -> List[Dict[str, str]]:
         rows: List[Dict[str, str]] = []
@@ -518,9 +542,11 @@ class WorkflowPane(QtWidgets.QWidget):
             getattr(self, "add_global_btn", None),
             getattr(self, "remove_global_btn", None),
             getattr(self, "clear_global_btn", None),
+            getattr(self, "reset_global_btn", None),
             getattr(self, "add_region_btn", None),
             getattr(self, "remove_region_btn", None),
             getattr(self, "clear_region_btn", None),
+            getattr(self, "reset_region_btn", None),
             getattr(self, "copy_global_to_region_btn", None),
             getattr(self, "global_params_label", None),
             getattr(self, "region_params_label", None),

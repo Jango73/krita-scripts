@@ -834,7 +834,13 @@ class ComfyUIEnhancer:
             return nodes[identifier]
         iterable = nodes.items() if isinstance(nodes, dict) else enumerate(nodes) if isinstance(nodes, list) else []
         for _, node in iterable:
-            if isinstance(node, dict) and node.get("name") == identifier:
+            if not isinstance(node, dict):
+                continue
+            if (
+                node.get("name") == identifier
+                or node.get("title") == identifier
+                or str(node.get("id")) == str(identifier)
+            ):
                 return node
         return None
 
