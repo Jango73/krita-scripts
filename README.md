@@ -25,7 +25,3 @@ For DZ_Face_Detailer node
 4) In the dialog, set the ComfyUI server URL (see the manual).
 5) Optionally select regions in your image (simple rectangle selections); they will be enhanced separately.
 6) Click “Go” (global + regions) or “Regions” (regions only). Results appear as new layers in Krita, with fading borders.
-
-## Things to know
-- During the enhancing process, the Krita UI responds less frequently to user input, this is normal but will be fixed when possible.
-- The plugin can accumulate many images in the ComfyUI output folder; you can clean it manually or enable the setting that permanently deletes output images after they are used by the plugin.
