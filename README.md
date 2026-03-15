@@ -1,5 +1,9 @@
 # Krita plugins in this repository
 
+## Disclaimer
+
+The scripts are provided "as is", without warranty of any kind. Neither the scripts' authors/contributors, nor the authors/contributors of bundled third-party software, can be held liable for any direct, indirect, incidental, special, exemplary, or consequential damages arising from the use of this project.
+
 ## Contents
 - **`comfy/`** — ComfyUI Image Enhance plugin. It sends the current image (and optional regions) to ComfyUI workflows, then re-inserts the results as new layers in Krita. Includes UI, config storage, HTTP client, workflow handling, and a short manual in `comfy/Manual.html`.
 - **`.desktop` files** — `comfy.desktop` and `select_face.desktop` register the plugins in Krita’s Scripts menu.
