@@ -1650,8 +1650,7 @@
                     "type": "BOOLEAN",
                     "links":
                     [
-                        138,
-                        230
+                        138
                     ]
                 }
             ],
@@ -1760,7 +1759,7 @@
                     {
                         "name": "cond"
                     },
-                    "link": 244
+                    "link": null
                 }
             ],
             "outputs":
@@ -2739,69 +2738,6 @@
             []
         },
         {
-            "id": 113,
-            "type": "ImpactLogicalOperators",
-            "pos":
-            [
-                -3080,
-                800
-            ],
-            "size":
-            [
-                270,
-                78
-            ],
-            "flags":
-            {},
-            "order": 28,
-            "mode": 0,
-            "inputs":
-            [
-                {
-                    "localized_name": "bool_a",
-                    "name": "bool_a",
-                    "type": "BOOLEAN",
-                    "link": 229
-                },
-                {
-                    "localized_name": "bool_b",
-                    "name": "bool_b",
-                    "type": "BOOLEAN",
-                    "link": 230
-                },
-                {
-                    "localized_name": "operator",
-                    "name": "operator",
-                    "type": "COMBO",
-                    "widget":
-                    {
-                        "name": "operator"
-                    },
-                    "link": null
-                }
-            ],
-            "outputs":
-            [
-                {
-                    "localized_name": "BOOLEAN",
-                    "name": "BOOLEAN",
-                    "type": "BOOLEAN",
-                    "links":
-                    [
-                        231
-                    ]
-                }
-            ],
-            "properties":
-            {
-                "Node name for S&R": "ImpactLogicalOperators"
-            },
-            "widgets_values":
-            [
-                "or"
-            ]
-        },
-        {
             "id": 112,
             "type": "ImpactLogicalOperators",
             "pos":
@@ -3576,8 +3512,7 @@
                     "type": "BOOLEAN",
                     "links":
                     [
-                        162,
-                        244
+                        162
                     ]
                 }
             ],
@@ -4106,7 +4041,7 @@
                     "localized_name": "bool_a",
                     "name": "bool_a",
                     "type": "BOOLEAN",
-                    "link": 231
+                    "link": 229
                 },
                 {
                     "localized_name": "bool_b",
@@ -5280,22 +5215,6 @@
             229,
             112,
             0,
-            113,
-            0,
-            "BOOLEAN"
-        ],
-        [
-            230,
-            63,
-            0,
-            113,
-            1,
-            "BOOLEAN"
-        ],
-        [
-            231,
-            113,
-            0,
             119,
             0,
             "BOOLEAN"
@@ -5377,14 +5296,6 @@
             119,
             0,
             114,
-            2,
-            "BOOLEAN"
-        ],
-        [
-            244,
-            82,
-            0,
-            97,
             2,
             "BOOLEAN"
         ]
