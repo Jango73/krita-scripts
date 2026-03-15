@@ -2,7 +2,6 @@
 
 ## Contents
 - **`comfy/`** — ComfyUI Image Enhance plugin. It sends the current image (and optional regions) to ComfyUI workflows, then re-inserts the results as new layers in Krita. Includes UI, config storage, HTTP client, workflow handling, and a short manual in `comfy/Manual.html`.
-- **`select_face/`** — Helper script for face selection (WIP, does not work well).
 - **`.desktop` files** — `comfy.desktop` and `select_face.desktop` register the plugins in Krita’s Scripts menu.
 - **`temp/`, `comfy/input`, `comfy/output`** — Temporary working folders used during processing.
 
