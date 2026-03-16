@@ -1249,7 +1249,7 @@ class ComfyUIEnhancer:
             detail = float(DEFAULT_DETAIL_VALUE)
         detail_ratio = detail / float(DETAIL_MAX)
         steps = detail_ratio * 30.0
-        cfg = detail_ratio * 2.0
+        cfg = 1.0 + detail_ratio * 1.0
         return {
             "Steps": str(int(round(steps))),
             "CFG": f"{cfg:.1f}",
@@ -1272,7 +1272,7 @@ class ComfyUIEnhancer:
         # In Simple creation, only control booleans are forced to 0.
         bool_targets = {
             "img2img",
-            "Input size mode",
+            "input size mode",
             "keep original size output",
             "face detailer",
         }
