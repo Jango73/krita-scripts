@@ -28,7 +28,7 @@ DEFAULT_GLOBAL_PARAMS = [
     {"target": "Scale input amount", "value": "0.5"},
     {"target": "Keep original size input", "value": "1"},
     {"target": "Keep original size output", "value": "1"},
-    {"target": "Initial stage", "value": "1"},
+    {"target": "Initial stage", "value": "0"},
     {"target": "Refine stage 1", "value": "1"},
     {"target": "Refine stage 2", "value": "0"},
     {"target": "Face detailer", "value": "0"},
@@ -47,7 +47,7 @@ DEFAULT_REGION_PARAMS = [
     {"target": "Scale input amount", "value": "{best-scale}"},
     {"target": "Keep original size input", "value": "1"},
     {"target": "Keep original size output", "value": "1"},
-    {"target": "Initial stage", "value": "1"},
+    {"target": "Initial stage", "value": "0"},
     {"target": "Refine stage 1", "value": "1"},
     {"target": "Refine stage 2", "value": "0"},
     {"target": "Face detailer", "value": "0"},
@@ -81,25 +81,7 @@ def _make_simple_params(base_params: List[Dict[str, str]]) -> List[Dict[str, str
     return updated
 
 
-def _override_param_value(
-    params: List[Dict[str, str]],
-    target_name: str,
-    target_value: str,
-) -> List[Dict[str, str]]:
-    updated: List[Dict[str, str]] = []
-    normalized_target = target_name.strip().lower()
-    for param in params:
-        target = param.get("target", "")
-        value = target_value if str(target).strip().lower() == normalized_target else param.get("value", "")
-        updated.append({"target": target, "value": value})
-    return updated
-
-
-DEFAULT_GLOBAL_PARAMS_SIMPLE = _override_param_value(
-    _make_simple_params(DEFAULT_GLOBAL_PARAMS),
-    "Initial stage",
-    "0",
-)
+DEFAULT_GLOBAL_PARAMS_SIMPLE = _make_simple_params(DEFAULT_GLOBAL_PARAMS)
 DEFAULT_REGION_PARAMS_SIMPLE = _make_simple_params(DEFAULT_REGION_PARAMS)
 
 class ConfigManager:
