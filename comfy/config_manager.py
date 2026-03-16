@@ -24,14 +24,13 @@ DEFAULT_DETAIL_VALUE = 25
 
 DEFAULT_GLOBAL_PARAMS = [
     {"target": "Img2img", "value": "1"},
-    {"target": "Scale input", "value": "1"},
-    {"target": "Scale input amount", "value": "0.5"},
-    {"target": "Keep original size input", "value": "1"},
+    {"target": "Input size mode", "value": "2"},
     {"target": "Keep original size output", "value": "1"},
     {"target": "Initial stage", "value": "0"},
     {"target": "Refine stage 1", "value": "1"},
     {"target": "Refine stage 2", "value": "0"},
     {"target": "Face detailer", "value": "0"},
+    {"target": "Scale input amount", "value": "0.5"},
     {"target": "Seed", "value": "0"},
     {"target": "Steps", "value": "8"},
     {"target": "CFG", "value": "1.0"},
@@ -43,14 +42,13 @@ DEFAULT_GLOBAL_PARAMS = [
 
 DEFAULT_REGION_PARAMS = [
     {"target": "Img2img", "value": "1"},
-    {"target": "Scale input", "value": "1"},
-    {"target": "Scale input amount", "value": "{best-scale}"},
-    {"target": "Keep original size input", "value": "1"},
+    {"target": "Input size mode", "value": "2"},
     {"target": "Keep original size output", "value": "1"},
     {"target": "Initial stage", "value": "0"},
     {"target": "Refine stage 1", "value": "1"},
     {"target": "Refine stage 2", "value": "0"},
     {"target": "Face detailer", "value": "0"},
+    {"target": "Scale input amount", "value": "{best-scale}"},
     {"target": "Seed", "value": "0"},
     {"target": "Steps", "value": "8"},
     {"target": "CFG", "value": "1.0"},

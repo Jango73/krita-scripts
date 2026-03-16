@@ -1272,8 +1272,7 @@ class ComfyUIEnhancer:
         # In Simple creation, only control booleans are forced to 0.
         bool_targets = {
             "img2img",
-            "scale input",
-            "keep original size input",
+            "Input size mode",
             "keep original size output",
             "face detailer",
         }
