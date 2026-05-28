@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-05-28
+
+### Added
+- Versioning system: `__version__`
+- CHANGELOG.md
+
+### Fixed
+- Enhance stuck on "already running" after connection failure to ComfyUI
+- Parameter handling edge cases
+- Manual formatting and content
+
+### Changed
+- Merged the two input scale parameters into one
+
 ## [1.0.0] - 2026-03-16
 
 First public release of the ComfyUI Image Enhance plugin for Krita.
