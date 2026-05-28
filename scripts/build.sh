@@ -31,6 +31,7 @@ rsync -a \
     --exclude '*.pyc' \
     --exclude '*.pyo' \
     --exclude '.DS_Store' \
+    --exclude 'input' \
     "${ROOT_DIR}/${PLUGIN_DIR}/" "${STAGING_DIR}/${PLUGIN_DIR}/"
 
 rm -f "${ARCHIVE_PATH}"
