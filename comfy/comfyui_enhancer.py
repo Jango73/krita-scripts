@@ -459,7 +459,11 @@ class ComfyUIEnhancer:
             raise RuntimeError("Enhance already running.")
         job = self._prepare_job(config, prompts, parameters, regions_only=regions_only)
         self._active_job = job
-        self._advance_job(job)
+        try:
+            self._advance_job(job)
+        except Exception:
+            self._active_job = None
+            raise
 
     def _prepare_job(
         self,
