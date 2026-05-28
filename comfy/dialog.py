@@ -12,6 +12,7 @@ from .config_manager import (
     DEFAULT_REGION_PARAMS,
 )
 from .parameter_set_manager import ParameterSetManager
+from ._version import __version__
 
 
 class ComfyUIDialog(QtWidgets.QDialog):
@@ -63,11 +64,16 @@ class ComfyUIDialog(QtWidgets.QDialog):
         log_layout.setContentsMargins(0, 0, 0, 0)
         log_layout.addWidget(self._build_log_group())
 
+        about_tab = QtWidgets.QWidget()
+        about_layout = QtWidgets.QVBoxLayout(about_tab)
+        about_layout.addWidget(self._build_about_group())
+
         manual_tab = QtWidgets.QWidget()
         manual_layout = QtWidgets.QVBoxLayout(manual_tab)
         manual_layout.setContentsMargins(0, 0, 0, 0)
         manual_layout.addWidget(self._build_manual_group())
 
+        self.tabs.addTab(about_tab, "About")
         self.tabs.addTab(manual_tab, "Manual")
         self.tabs.addTab(server_tab, "Settings")
         self.log_tab_index = self.tabs.addTab(log_tab, "Log")
@@ -82,6 +88,21 @@ class ComfyUIDialog(QtWidgets.QDialog):
 
         layout.addWidget(QtWidgets.QLabel("Server URL"), 0, 0)
         layout.addWidget(self.server_edit, 0, 1, 1, 2)
+        return group
+
+    def _build_about_group(self) -> QtWidgets.QGroupBox:
+        group = QtWidgets.QGroupBox("About")
+        layout = QtWidgets.QVBoxLayout(group)
+        text = QtWidgets.QTextBrowser()
+        text.setOpenExternalLinks(True)
+        text.setHtml(
+            f"<h3>ComfyUI Image Enhance</h3>"
+            f"<p>Version {__version__}</p>"
+            f"<p>Copyright 2025-2026 Jango73</p>"
+            f"<p><a href=\"https://github.com/Jango73\">github.com/Jango73</a></p>"
+            f"<p>License: GPL v3</p>"
+        )
+        layout.addWidget(text)
         return group
 
     def _build_manual_group(self) -> QtWidgets.QGroupBox:

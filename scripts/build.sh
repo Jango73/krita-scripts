@@ -8,7 +8,8 @@ DESKTOP_FILE="${PLUGIN_NAME}.desktop"
 PLUGIN_DIR="${PLUGIN_NAME}"
 DIST_DIR="${ROOT_DIR}/dist"
 STAGING_DIR="${DIST_DIR}/.package-staging"
-ARCHIVE_PATH="${DIST_DIR}/${PLUGIN_NAME}-krita-plugin.zip"
+VERSION="$(sed -n 's/^__version__ = "\(.*\)"/\1/p' "${ROOT_DIR}/comfy/_version.py" 2>/dev/null || echo "0.0.0")"
+ARCHIVE_PATH="${DIST_DIR}/${PLUGIN_NAME}-krita-plugin-${VERSION}.zip"
 
 if [[ ! -f "${ROOT_DIR}/${DESKTOP_FILE}" ]]; then
     echo "Missing desktop file: ${DESKTOP_FILE}" >&2
