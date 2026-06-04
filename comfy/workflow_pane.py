@@ -197,7 +197,7 @@ class WorkflowPane(QtWidgets.QWidget):
         layout.addWidget(self.simple_creation_detail_label, 3, 0)
         layout.addWidget(self.creation_detail_slider, 3, 1)
         layout.addWidget(self.creation_detail_spin, 3, 2)
-        layout.addWidget(QtWidgets.QLabel("Random Seed"), 4, 0)
+        layout.addWidget(QtWidgets.QLabel("Seed"), 4, 0)
         layout.addWidget(self.random_seed_slider, 4, 1)
         layout.addWidget(seed_spin, 4, 2)
         layout.setColumnStretch(1, 1)
