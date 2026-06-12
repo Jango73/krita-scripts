@@ -666,6 +666,12 @@ class WorkflowPane(QtWidgets.QWidget):
     def set_status(self, message: str) -> None:
         if hasattr(self, "status_label") and self.status_label:
             self.status_label.setText(message)
+            if message == "Failed":
+                self.status_label.setStyleSheet("background-color: red; color: white;")
+            elif message == "Done":
+                self.status_label.setStyleSheet("background-color: green; color: white;")
+            else:
+                self.status_label.setStyleSheet("background-color: orange; color: white;")
 
     def _init_parameter_sets_ui(self) -> None:
         """Prepare parameter set controls based on availability of a manager."""
