@@ -15,6 +15,65 @@ from .config_manager import (
 )
 
 
+class CollapsibleGroupBox(QtWidgets.QWidget):
+    """A group box that can be collapsed/expanded by clicking its title."""
+
+    def __init__(
+        self,
+        title: str,
+        parent: Optional[QtWidgets.QWidget] = None,
+        collapsed: bool = False,
+    ) -> None:
+        super().__init__(parent)
+
+        outer = QtWidgets.QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(0)
+
+        self._toggle_btn = QtWidgets.QPushButton()
+        self._toggle_btn.setFlat(True)
+        self._toggle_btn.setCursor(QtCore.Qt.PointingHandCursor)
+        self._toggle_btn.setStyleSheet(
+            "QPushButton { text-align: left; padding: 6px;"
+            " font-weight: bold; border: 1px solid palette(mid);"
+            " border-radius: 4px; }"
+            "QPushButton:hover { background: palette(light); }"
+        )
+        self._toggle_btn.clicked.connect(self._toggle)
+
+        self._separator = QtWidgets.QFrame()
+        self._separator.setFrameShape(QtWidgets.QFrame.HLine)
+        self._separator.setFrameShadow(QtWidgets.QFrame.Sunken)
+
+        self._content = QtWidgets.QWidget()
+
+        outer.addWidget(self._toggle_btn)
+        outer.addWidget(self._separator)
+        outer.addWidget(self._content)
+
+        self._title = title
+        self._collapsed = collapsed
+        self._content.setVisible(not collapsed)
+        self._separator.setVisible(not collapsed)
+        self._update_arrow()
+
+    def setContentLayout(self, layout: QtWidgets.QLayout) -> None:
+        self._content.setLayout(layout)
+
+    def _toggle(self) -> None:
+        self._collapsed = not self._collapsed
+        visible = not self._collapsed
+        self._content.setVisible(visible)
+        self._separator.setVisible(visible)
+        self._update_arrow()
+        self.updateGeometry()
+
+    def _update_arrow(self) -> None:
+        self._toggle_btn.setText(
+            ("\u25bc" if not self._collapsed else "\u25b6") + " " + self._title
+        )
+
+
 class WorkflowPane(QtWidgets.QWidget):
     """Encapsulates the workflow controls (prompts, params, actions)."""
 
@@ -77,10 +136,10 @@ class WorkflowPane(QtWidgets.QWidget):
         self._apply_mode_ui()
         self._schedule_param_resize()
 
-    def _build_parameter_sets_group(self) -> QtWidgets.QGroupBox:
-        group = QtWidgets.QGroupBox("Parameter sets")
-        group.setFixedHeight(200)
-        layout = QtWidgets.QVBoxLayout(group)
+    def _build_parameter_sets_group(self) -> CollapsibleGroupBox:
+        group = CollapsibleGroupBox("Parameter sets", collapsed=True)
+        layout = QtWidgets.QVBoxLayout()
+        group.setContentLayout(layout)
 
         self.parameter_sets_list = QtWidgets.QListWidget()
         self.parameter_sets_list.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
@@ -129,9 +188,10 @@ class WorkflowPane(QtWidgets.QWidget):
         row.addStretch(1)
         return row
 
-    def _build_prompts_group(self) -> QtWidgets.QGroupBox:
-        group = QtWidgets.QGroupBox("Prompts")
-        layout = QtWidgets.QGridLayout(group)
+    def _build_prompts_group(self) -> CollapsibleGroupBox:
+        group = CollapsibleGroupBox("Prompts", collapsed=True)
+        layout = QtWidgets.QGridLayout()
+        group.setContentLayout(layout)
 
         self.global_prompt_edit = QtWidgets.QPlainTextEdit()
         self.global_prompt_edit.textChanged.connect(self._sync_simple_creation_prompt_from_global)
@@ -166,9 +226,10 @@ class WorkflowPane(QtWidgets.QWidget):
             )
         return group
 
-    def _build_simple_controls_group(self) -> QtWidgets.QGroupBox:
-        group = QtWidgets.QGroupBox("Simple controls")
-        layout = QtWidgets.QGridLayout(group)
+    def _build_simple_controls_group(self) -> CollapsibleGroupBox:
+        group = CollapsibleGroupBox("Simple controls")
+        layout = QtWidgets.QGridLayout()
+        group.setContentLayout(layout)
         self.enhance_slider, enhance_spin = self._build_slider_row(0, 100, 20)
         self.enhance_spin = enhance_spin
         self.random_seed_slider, seed_spin = self._build_slider_row(0, 10000, 0)
@@ -219,9 +280,11 @@ class WorkflowPane(QtWidgets.QWidget):
         spin.valueChanged.connect(slider.setValue)
         return slider, spin
 
-    def _build_parameters_group(self) -> QtWidgets.QGroupBox:
-        self.parameters_group = QtWidgets.QGroupBox("Workflow parameters")
-        layout = QtWidgets.QGridLayout(self.parameters_group)
+    def _build_parameters_group(self) -> CollapsibleGroupBox:
+        group = CollapsibleGroupBox("Workflow parameters", collapsed=True)
+        self.parameters_group = group
+        layout = QtWidgets.QGridLayout()
+        group.setContentLayout(layout)
 
         self.global_params = self._make_param_table()
         self.add_global_btn = QtWidgets.QPushButton("Add")
